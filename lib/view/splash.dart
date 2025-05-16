@@ -34,8 +34,8 @@ class SplashScreen extends StatelessWidget {
           // Loading animation
           Lottie.asset(
             'assets/lottie/loading.json',
-            width: 100,
-            height: 100,
+            width: 150,
+            height: 150,
             fit: BoxFit.contain,
           ),
         ],
@@ -43,7 +43,8 @@ class SplashScreen extends StatelessWidget {
       nextScreen: const Login(),
       splashIconSize: 500,
       backgroundColor: Colors.white,
-      duration: 3000, // Duration in milliseconds
+      duration: 5000, // Duration in milliseconds
+
     );
   }
 }

@@ -17,12 +17,6 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Login Page"),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        centerTitle: true,
-      ),
       body: SingleChildScrollView(
         child: Form(
           key: _formkey,
@@ -166,29 +160,32 @@ class _LoginState extends State<Login> {
                   
                 ),
                 Center(
-                  child: Container( 
-                          padding: EdgeInsets.only(top: 50), 
-                          child: GestureDetector(
-                            onTap: (){
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context)=>Signup()),
-                              );
-                            },
-                          
-                          child: Text( 
-                            'SIGN UP!', 
-                            style: TextStyle( 
-                              fontSize: 20, 
-                              
-                              // Bold text.
-                              fontWeight: FontWeight.w700, 
-                              
-                              // Text color.
-                              color: Colors.lightBlue, 
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container( 
+                            padding: EdgeInsets.only(top: 50), 
+                            child: GestureDetector(
+                              onTap: (){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context)=>Signup()),
+                                );
+                              },
+                            
+                            child: Text(
+                              'SIGN UP!', 
+                              style: TextStyle( 
+                                fontSize: 20, 
+                                
+                                // Bold text.
+                                fontWeight: FontWeight.w700, 
+                                
+                                // Text color.
+                                color: Colors.lightBlue, 
+                              ), 
                             ), 
-                          ), 
-                        ),
+                          ),
+                    ),
                   )
                 )
               ],

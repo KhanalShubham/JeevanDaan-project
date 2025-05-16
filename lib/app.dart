@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:jeevandaan/view/login.dart';
+import 'package:jeevandaan/view/splash.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: Login());
+    return MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen());
   }
 }
