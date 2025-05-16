@@ -1,34 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 
-import 'package:jeevandaan/view/signup.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class Signup extends StatefulWidget {
+  const Signup({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<Signup> createState() => _SignupState();
 }
 
-class _LoginState extends State<Login> {
+class _SignupState extends State<Signup> {
   Map userData = {};
   final _formkey = GlobalKey<FormState>();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Login Page"),
+        title: Text("SignUp"),
+        centerTitle: true,
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
-        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Form(
           key: _formkey,
           child: Column(
             children: <Widget>[
-              // Logo Section
               Padding(
                 padding: const EdgeInsets.only(top: 30.0),
                 child: Container(
@@ -45,8 +42,30 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-              // Email Field
+
+              //for name feild
               Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    hintText: "Name",
+                    labelText: "Name",
+                    prefixIcon: Icon(Icons.person),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.green),
+                      borderRadius: BorderRadius.all(Radius.circular(9.0)),
+                    ),
+                    errorStyle: TextStyle(fontSize: 18.0),
+                  ),
+                  validator: MultiValidator([
+                    RequiredValidator(errorText: "Enter your Full Name"),
+                    PatternValidator(r'^[a-zA-Z ]+$', errorText: "Name must contain only alphabets and spaces"),
+
+                  ]),
+                ),
+              ),
+              //for email feild 
+               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
                 child: TextFormField(
                   decoration: InputDecoration(
@@ -65,7 +84,27 @@ class _LoginState extends State<Login> {
                   ]),
                 ),
               ),
-              // Password Field
+              //for phone number feild 
+               Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    hintText: "Phone Number",
+                    labelText: "Phone Number",
+                    prefixIcon: Icon(Icons.phone),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.green),
+                      borderRadius: BorderRadius.all(Radius.circular(9.0)),
+                    ),
+                    errorStyle: TextStyle(fontSize: 18.0),
+                  ),
+                  validator: MultiValidator([
+                     RequiredValidator(errorText: "Enter your phone number"),
+                     PatternValidator(r'^[0-9]{10}$', errorText: "Enter a valid 10-digit phone number"),
+                  ]),
+                ),
+              ),
+              //for password feild 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
                 child: TextFormField(
@@ -78,21 +117,16 @@ class _LoginState extends State<Login> {
                   decoration: InputDecoration(
                     hintText: "Password",
                     labelText: "Password",
-                    prefixIcon: Icon(Icons.key, color: Colors.green),
+                    prefixIcon: Icon(Icons.key, color: Colors.black),
                     errorStyle: TextStyle(fontSize: 18.0),
                     border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.green),
+                      borderSide: BorderSide(color: Colors.black),
                       borderRadius: BorderRadius.all(Radius.circular(9.0)),
                     ),
                   ),
                 ),
               ),
-              Container(
-                margin: EdgeInsets.fromLTRB(200,0,0,0),
-                child: Text("Forget Password"),
-              ),
-              //login button
-             Padding(
+              Padding(
               padding: const EdgeInsets.all(28.0),
               child: Container(
                 width: double.infinity, // to stretch button full width — optional
@@ -111,7 +145,7 @@ class _LoginState extends State<Login> {
                     }
                   },
                   child: Text(
-                    "Login",
+                    "Sign In",
                     style: TextStyle(
                       fontSize: 22,
                     ),
@@ -126,7 +160,7 @@ class _LoginState extends State<Login> {
                 padding: EdgeInsets.fromLTRB(0,30,0,0),
                 child: Center(
                   child: Text(
-                    "Or Sign In using !",
+                    "Or Sign Up using !",
                     style: TextStyle(
                       fontSize: 18,color: Colors.black
                     ),
@@ -168,16 +202,8 @@ class _LoginState extends State<Login> {
                 Center(
                   child: Container( 
                           padding: EdgeInsets.only(top: 50), 
-                          child: GestureDetector(
-                            onTap: (){
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context)=>Signup()),
-                              );
-                            },
-                          
                           child: Text( 
-                            'SIGN UP!', 
+                            'Already have an account click here ', 
                             style: TextStyle( 
                               fontSize: 20, 
                               
@@ -189,14 +215,15 @@ class _LoginState extends State<Login> {
                             ), 
                           ), 
                         ),
-                  )
                 )
               ],
             )
+              
             ],
           ),
         ),
       ),
+
     );
   }
 }
