@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-
 import 'package:jeevandaan/view/signup.dart';
 
 class Login extends StatefulWidget {
@@ -13,184 +12,300 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   Map userData = {};
   final _formkey = GlobalKey<FormState>();
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Form(
-          key: _formkey,
-          child: Column(
-            children: <Widget>[
-              // Logo Section
-              Padding(
-                padding: const EdgeInsets.only(top: 30.0),
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(40),
-                    border: Border.all(color: Colors.blueGrey),
-                  ),
-                  child: Image.asset(
-                    'assets/lottie/images/logo.png',
-                    height: 30,
-                    width: 20,
-                  ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Form(
+            key: _formkey,
+            child: Column(             
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              children: <Widget>[
+                SizedBox(height: 20,),
+                // Header text
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    GestureDetector(child: Icon(Icons.arrow_back),
+                      onTap: () => Navigator.pop(context),
+                    )
+                    
+                  ],
                 ),
-              ),
-              // Email Field
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Email",
-                    labelText: "Email",
-                    prefixIcon: Icon(Icons.email),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.green),
-                      borderRadius: BorderRadius.all(Radius.circular(9.0)),
-                    ),
-                    errorStyle: TextStyle(fontSize: 18.0),
-                  ),
-                  validator: MultiValidator([
-                    RequiredValidator(errorText: "Enter email address"),
-                    EmailValidator(errorText: "Enter a valid email address example: someone@gmail.com"),
-                  ]),
-                ),
-              ),
-              // Password Field
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 12.0),
-                child: TextFormField(
-                  obscureText: true,
-                  validator: MultiValidator([
-                    RequiredValidator(errorText: "Please enter your password"),
-                    MinLengthValidator(8, errorText: "Password must be at least 8 characters"),
-                    PatternValidator(r'(?=.*?[#!@$%^&*-])', errorText: "Password must have at least one special character"),
-                  ]),
-                  decoration: InputDecoration(
-                    hintText: "Password",
-                    labelText: "Password",
-                    prefixIcon: Icon(Icons.key, color: Colors.green),
-                    errorStyle: TextStyle(fontSize: 18.0),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.green),
-                      borderRadius: BorderRadius.all(Radius.circular(9.0)),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.fromLTRB(200,0,0,0),
-                child: Text("Forget Password"),
-              ),
-              //login button
-             Padding(
-              padding: const EdgeInsets.all(28.0),
-              child: Container(
-                width: double.infinity, // to stretch button full width — optional
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(9.0),
-                    ),
-                  ),
-                  onPressed: () {
-                    if (_formkey.currentState!.validate()) {
-                      print("Form submitted");
-                    }
-                  },
+                const Padding(
+                  padding: EdgeInsets.only(top: 60.0, bottom: 30.0),
                   child: Text(
-                    "Login",
+                    'Sign in with your email or\nphone number',
                     style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF4A4A4A),
                     ),
                   ),
                 ),
                 
-              ),
-              
-            ),
-            Center(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(0,30,0,0),
-                child: Center(
-                  child: Text(
-                    "Or Sign In using !",
-                    style: TextStyle(
-                      fontSize: 18,color: Colors.black
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+                // Email/Phone Field
                 Padding(
-                  padding: EdgeInsets.fromLTRB(0,20,0,0),
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    child: Image.asset(
-                      "assets/lottie/images/google.png",
-                      
-                      fit: BoxFit.cover,
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      hintText: "Email or Phone number",
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey.shade400),
+                      ),
                     ),
-                    
+                    validator: MultiValidator([
+                      RequiredValidator(errorText: "Please enter your email address or phone number"),
+                    ]),
                   ),
-                  
                 ),
+                
+                // Password Field
                 Padding(
-                  padding: EdgeInsets.fromLTRB(0,20,0,0),
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    child: Image.asset(
-                      "assets/lottie/images/facebook.png",
-                      
-                      fit: BoxFit.cover,
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: TextFormField(
+                    obscureText: _obscureText,
+                    decoration: InputDecoration(
+                      hintText: "Password",
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey.shade400),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText ? Icons.visibility_off : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      ),
                     ),
-                    
+                    validator: MultiValidator([
+                      RequiredValidator(errorText: "Please enter your password"),
+                      MinLengthValidator(8, errorText: "Password must be at least 8 characters"),
+                    ]),
                   ),
-                  
                 ),
+                
+                // Forget Password
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      // Handle forget password
+                    },
+                    child: Text(
+                      "Forget Password ?",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ),
+                
+                // Sign In button
+                Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4CAF50), // Green color
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: () {
+                        if (_formkey.currentState!.validate()) {
+                          print("Form submitted");
+                        }
+                      },
+                      child: const Text(
+                        "Sign In",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                
+                // Or divider
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          color: Colors.grey.shade300,
+                          thickness: 1,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          "or",
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(
+                          color: Colors.grey.shade300,
+                          thickness: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Continue with Phone Button
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.phone, size: 18),
+                      label: const Text("Continue With Phone"),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.black87,
+                        side: BorderSide(color: Colors.grey.shade300),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      onPressed: () {
+                        // Handle phone sign in
+                      },
+                    ),
+                  ),
+                ),
+                
+                // Sign up with Gmail Button
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      icon: Image.asset(
+                        "assets/lottie/images/google.png",
+                        width: 18,
+                        height: 18,
+                      ),
+                      label: const Text("Sign up with Gmail"),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.black87,
+                        side: BorderSide(color: Colors.grey.shade300),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      onPressed: () {
+                        // Handle Gmail sign in
+                      },
+                    ),
+                  ),
+                ),
+                
+                // Sign up with Facebook Button
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 24.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      icon: Icon(Icons.facebook, color: Colors.blue, size: 18),
+                      label: const Text("Sign up with Facebook"),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.black87,
+                        side: BorderSide(color: Colors.grey.shade300),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      onPressed: () {
+                        // Handle Facebook sign in
+                      },
+                    ),
+                  ),
+                ),
+                
+                // Don't have an account
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container( 
-                            padding: EdgeInsets.only(top: 50), 
-                            child: GestureDetector(
-                              onTap: (){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context)=>Signup()),
-                                );
-                              },
-                            
-                            child: Text(
-                              'SIGN UP!', 
-                              style: TextStyle( 
-                                fontSize: 20, 
-                                
-                                // Bold text.
-                                fontWeight: FontWeight.w700, 
-                                
-                                // Text color.
-                                color: Colors.lightBlue, 
-                              ), 
-                            ), 
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Don't have an account? ",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade700,
                           ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => Signup()),
+                            );
+                          },
+                          child: const Text(
+                            "Sign Up",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  )
-                )
+                  ),
+                ),
               ],
-            )
-            ],
+            ),
           ),
         ),
       ),
