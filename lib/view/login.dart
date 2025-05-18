@@ -155,7 +155,7 @@ class _LoginState extends State<Login> {
                             const SnackBar(
                                 content: Text("Logged in successfully")),
                           );
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>Dashboard()));
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Dashboard()));
                         }
                       },
                       child: const Text(
