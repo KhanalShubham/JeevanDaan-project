@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:jeevandaan/view/dashboard.dart';
 import 'package:jeevandaan/view/signup.dart';
 
 class Login extends StatefulWidget {
@@ -17,29 +18,28 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Form(
-            key: _formkey,
-            child: Column(             
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children: <Widget>[
-                SizedBox(height: 20,),
-                // Header text
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    GestureDetector(child: Icon(Icons.arrow_back),
-                      onTap: () => Navigator.pop(context),
-                    )
-                    
-                  ],
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(top: 60.0, bottom: 30.0),
-                  child: Text(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Form(
+              key: _formkey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const SizedBox(height: 20),
+                  // Back button
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
+                  // Header text
+                  const Text(
                     'Sign in with your email or\nphone number',
                     style: TextStyle(
                       fontSize: 24,
@@ -47,17 +47,16 @@ class _LoginState extends State<Login> {
                       color: Color(0xFF4A4A4A),
                     ),
                   ),
-                ),
-                
-                // Email/Phone Field
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: TextFormField(
+                  const SizedBox(height: 40),
+                  // Email/Phone Field with Icon
+                  TextFormField(
                     decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.email_outlined),
                       hintText: "Email or Phone number",
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 16.0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -72,21 +71,22 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     validator: MultiValidator([
-                      RequiredValidator(errorText: "Please enter your email address or phone number"),
+                      RequiredValidator(
+                          errorText:
+                              "Please enter your email address or phone number"),
                     ]),
                   ),
-                ),
-                
-                // Password Field
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: TextFormField(
+                  const SizedBox(height: 16),
+                  // Password Field with Icon
+                  TextFormField(
                     obscureText: _obscureText,
                     decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.lock_outline),
                       hintText: "Password",
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 16.0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),
                         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -101,7 +101,9 @@ class _LoginState extends State<Login> {
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscureText ? Icons.visibility_off : Icons.visibility,
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: Colors.grey,
                         ),
                         onPressed: () {
@@ -113,37 +115,34 @@ class _LoginState extends State<Login> {
                     ),
                     validator: MultiValidator([
                       RequiredValidator(errorText: "Please enter your password"),
-                      MinLengthValidator(8, errorText: "Password must be at least 8 characters"),
+                      MinLengthValidator(8,
+                          errorText: "Password must be at least 8 characters"),
                     ]),
                   ),
-                ),
-                
-                // Forget Password
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      // Handle forget password
-                    },
-                    child: Text(
-                      "Forget Password ?",
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w400,
+                  // Forget Password
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        // Handle forget password
+                      },
+                      child: const Text(
+                        "Forgot Password?",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                
-                // Sign In button
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: SizedBox(
+                  const SizedBox(height: 10),
+                  // Sign In button
+                  SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4CAF50), // Green color
+                        backgroundColor: const Color(0xFF4CAF50),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
@@ -152,7 +151,11 @@ class _LoginState extends State<Login> {
                       ),
                       onPressed: () {
                         if (_formkey.currentState!.validate()) {
-                          print("Form submitted");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Logged in successfully")),
+                          );
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>Dashboard()));
                         }
                       },
                       child: const Text(
@@ -164,12 +167,9 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                   ),
-                ),
-                
-                // Or divider
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24.0),
-                  child: Row(
+                  const SizedBox(height: 24),
+                  // Or divider
+                  Row(
                     children: [
                       Expanded(
                         child: Divider(
@@ -195,85 +195,46 @@ class _LoginState extends State<Login> {
                       ),
                     ],
                   ),
-                ),
-                
-                // Continue with Phone Button
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.phone, size: 18),
-                      label: const Text("Continue With Phone"),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black87,
-                        side: BorderSide(color: Colors.grey.shade300),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
+                  const SizedBox(height: 20),
+                  // Social icons row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.phone, size: 28),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Phone sign in tapped")),
+                          );
+                        },
                       ),
-                      onPressed: () {
-                        // Handle phone sign in
-                      },
-                    ),
+                      const SizedBox(width: 20),
+                      IconButton(
+                        icon: const Icon(Icons.mail_outline, size: 28),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Gmail sign in tapped")),
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 20),
+                      IconButton(
+                        icon: const Icon(Icons.facebook,
+                            color: Colors.blue, size: 28),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Facebook sign in tapped")),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                ),
-                
-                // Sign up with Gmail Button
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: OutlinedButton.icon(
-                      icon: Image.asset(
-                        "assets/lottie/images/google.png",
-                        width: 18,
-                        height: 18,
-                      ),
-                      label: const Text("Sign up with Gmail"),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black87,
-                        side: BorderSide(color: Colors.grey.shade300),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      onPressed: () {
-                        // Handle Gmail sign in
-                      },
-                    ),
-                  ),
-                ),
-                
-                // Sign up with Facebook Button
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 24.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: OutlinedButton.icon(
-                      icon: Icon(Icons.facebook, color: Colors.blue, size: 18),
-                      label: const Text("Sign up with Facebook"),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black87,
-                        side: BorderSide(color: Colors.grey.shade300),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      onPressed: () {
-                        // Handle Facebook sign in
-                      },
-                    ),
-                  ),
-                ),
-                
-                // Don't have an account
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 24.0),
+                  const SizedBox(height: 20),
+                  // Don't have an account
+                  Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -288,7 +249,8 @@ class _LoginState extends State<Login> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => Signup()),
+                              MaterialPageRoute(
+                                  builder: (context) => const Signup()),
                             );
                           },
                           child: const Text(
@@ -303,8 +265,9 @@ class _LoginState extends State<Login> {
                       ],
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 30),
+                ],
+              ),
             ),
           ),
         ),

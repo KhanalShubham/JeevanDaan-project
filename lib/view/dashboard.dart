@@ -10,12 +10,16 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("Welcome to dashboard screen")
-        ],
+     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Dashboard"),
+        backgroundColor: Colors.green,
+      ),
+      body: const Center(
+        child: Text(
+          'Welcome to your Dashboard!',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }
