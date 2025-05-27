@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jeevandaan/view/login.dart';
 import 'package:jeevandaan/view/splash.dart';
 class App extends StatelessWidget {
   const App({super.key});
