@@ -85,88 +85,99 @@ class _DashboardState extends State<Dashboard> {
             ),
             SizedBox(height: 10),
             SizedBox(
-              height: 150, // Height of the slider
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 3, // Example: 3 cards for the slider
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Container(
-                        width: 250,
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                      "assets/lottie/images/child${index + 1}.png"),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Support Cancer Warriors",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "Donate \$20 to help your nearest hospital.",
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.black54,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(height: 4),
-                                  TextButton(
-                                    onPressed: () {},
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                      minimumSize: Size(50, 30),
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                    ),
-                                    child: Text(
-                                      "Donate",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+  height: 150, // Height of the slider
+  child: ListView.builder(
+    scrollDirection: Axis.horizontal,
+    itemCount: 3, // Example: 3 cards for the slider
+    itemBuilder: (context, index) {
+      return Padding(
+        padding: const EdgeInsets.only(right: 10.0),
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Container(
+            width: 250, // Width of the card
+            height: 150, // Height of the card
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Image that fills the card
+                  Image.asset(
+                    "assets/lottie/images/card.png",
+                    fit: BoxFit.cover, // Ensures the image fills the card
+                  ),
+                  // Overlay for text and button
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.7),
+                            Colors.transparent,
                           ],
                         ),
                       ),
-                    ),
-                  );
-                },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Support Cancer Warriors",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            "Donate \$20 to help your nearest hospital.",
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.white70,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 4),
+                          TextButton(
+                            onPressed: () {},
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size(50, 30),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: Text(
+                              "Donate",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.greenAccent,
+                                fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
+          );
+        },
+      ),
+    ),
             SizedBox(height: 20),
             Text(
               "Organizations:",
@@ -189,7 +200,7 @@ class _DashboardState extends State<Dashboard> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     image: DecorationImage(
-                      image: AssetImage("assets/lottie/images/child.png"),
+                      image: AssetImage("assets/lottie/images/nepal_medical.png"),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -223,7 +234,7 @@ class _DashboardState extends State<Dashboard> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     image: DecorationImage(
-                      image: AssetImage("assets/lottie/images/child.png"),
+                      image: AssetImage("assets/lottie/images/trauma.png"),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -257,7 +268,7 @@ class _DashboardState extends State<Dashboard> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     image: DecorationImage(
-                      image: AssetImage("assets/lottie/images/child.png"),
+                      image: AssetImage("assets/lottie/images/cancer.png"),
                       fit: BoxFit.cover,
                     ),
                   ),

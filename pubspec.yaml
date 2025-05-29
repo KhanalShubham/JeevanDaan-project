@@ -67,6 +67,10 @@ flutter:
     - assets/lottie/images/google.png
     - assets/lottie/images/facebook.png
     - assets/lottie/images/child.png
+    - assets/lottie/images/nepal_medical.png
+    - assets/lottie/images/trauma.png
+    - assets/lottie/images/cancer.png
+    - assets/lottie/images/card.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
