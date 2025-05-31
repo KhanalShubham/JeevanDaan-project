@@ -54,7 +54,7 @@ class _BoardingState extends State<BoardingScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Image.asset(
-                  'assets/lottie/images/child.png', // Make sure to add this image to your assets
+                  'assets/images/child.png', // Make sure to add this image to your assets
                   fit: BoxFit.contain,
                 ),
               ),

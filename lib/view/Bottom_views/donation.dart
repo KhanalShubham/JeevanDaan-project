@@ -10,26 +10,25 @@ class DonationPage extends StatefulWidget {
 class _DonationPageState extends State<DonationPage> {
   double totalDonation = 0.0;
 
-  // List of patients with their details
   final List<Map<String, dynamic>> patients = [
     {
       'name': 'Anita Sharma',
       'condition': 'Cancer Treatment',
-      'image': 'assets/patient1.jpg',
+      'image': 'assets/images/profile.png',
       'donationGoal': 500.0,
       'donatedAmount': 150.0,
     },
     {
       'name': 'Ramesh Thapa',
       'condition': 'Trauma Recovery',
-      'image': 'assets/patient2.jpg',
+      'image': 'assets/images/profile.png',
       'donationGoal': 300.0,
       'donatedAmount': 100.0,
     },
     {
       'name': 'Sita Rai',
       'condition': 'Heart Surgery',
-      'image': 'assets/patient3.jpg',
+      'image': 'assets/images/profile.png',
       'donationGoal': 700.0,
       'donatedAmount': 200.0,
     },
@@ -47,13 +46,11 @@ class _DonationPageState extends State<DonationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Donate to Patients'),
-        backgroundColor: Colors.green,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Total Donation Display
             Container(
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -69,7 +66,6 @@ class _DonationPageState extends State<DonationPage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      // Add logic to process donation (e.g., payment gateway)
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Donation Processed!')),
                       );
@@ -81,7 +77,6 @@ class _DonationPageState extends State<DonationPage> {
               ),
             ),
             SizedBox(height: 20),
-            // Patients List
             Expanded(
               child: ListView.builder(
                 itemCount: patients.length,
@@ -118,7 +113,7 @@ class _DonationPageState extends State<DonationPage> {
                         ],
                       ),
                       trailing: DropdownButton<double>(
-                        value: 10.0, // Default value
+                        value: 10.0,
                         items: [10.0, 20.0, 50.0].map((amount) {
                           return DropdownMenuItem<double>(
                             value: amount,

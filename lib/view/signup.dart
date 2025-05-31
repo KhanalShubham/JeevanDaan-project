@@ -308,7 +308,7 @@ class _SignupState extends State<Signup> {
                         _showSnackbar('Google sign up tapped');
                       },
                       icon: Image.asset(
-                        'assets/lottie/images/google.png',
+                        'assets/images/google.png',
                         width: 28,
                         height: 28,
                       ),

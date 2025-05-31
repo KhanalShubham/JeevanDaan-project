@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jeevandaan/view/Bottom_views/donation.dart';
+import 'package:jeevandaan/view/Bottom_views/notification.dart';
+import 'package:jeevandaan/view/Bottom_views/profile.dart';
 import 'package:jeevandaan/view/dashboard.dart';
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -32,8 +34,8 @@ class _MainNavigationState extends State<MainNavigation> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.black,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -43,17 +45,17 @@ class _MainNavigationState extends State<MainNavigation> {
           BottomNavigationBarItem(
             icon: Icon(Icons.card_giftcard),
             label: "Donation",
-            backgroundColor: Colors.yellow,
+            backgroundColor: Colors.green,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
             label: "Notification",
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.green,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: "Profile",
-            backgroundColor: Colors.lightBlue,
+            backgroundColor: Colors.green,
           ),
         ],
       ),

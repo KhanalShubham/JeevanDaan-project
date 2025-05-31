@@ -1,57 +1,14 @@
 import 'package:flutter/material.dart';
 
-class Dashboard extends StatefulWidget {
+class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
 
   @override
-  State<Dashboard> createState() => _DashboardState();
-}
-
-class _DashboardState extends State<Dashboard> {
-  int _selectedIndex = 0; // To track the selected bottom navigation item
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+ Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Welcome,",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.normal,
-                color: Colors.black54,
-              ),
-            ),
-            Text(
-              "Shubham Khanal",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              radius: 24,
-              backgroundImage: AssetImage("assets/lottie/images/child.png"),
-            ),
-          ),
-        ],
-        backgroundColor: Colors.white,
+        title: Text("Home"),
         elevation: 0,
       ),
       body: Padding(
@@ -59,6 +16,53 @@ class _DashboardState extends State<Dashboard> {
         child: ListView(
           clipBehavior: Clip.hardEdge,
           children: [
+            // Welcome section with CircleAvatar on the same row
+            Container(
+              padding: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white, // Light purple background
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Welcome text
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Welcome,",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        Text(
+                          "Shubham Khanal",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // CircleAvatar
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: CircleAvatar(
+                      radius: 24,
+                      backgroundImage: AssetImage("assets/images/child.png"),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            // Search bar
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey[200],
@@ -75,6 +79,7 @@ class _DashboardState extends State<Dashboard> {
               ),
             ),
             SizedBox(height: 20),
+            // Emergency Help section
             Text(
               "Emergency Help",
               style: TextStyle(
@@ -85,83 +90,90 @@ class _DashboardState extends State<Dashboard> {
             ),
             SizedBox(height: 10),
             SizedBox(
-  height: 150, // Height of the slider
-  child: ListView.builder(
-    scrollDirection: Axis.horizontal,
-    itemCount: 3, // Example: 3 cards for the slider
-    itemBuilder: (context, index) {
-      return Padding(
-        padding: const EdgeInsets.only(right: 10.0),
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Container(
-            width: 250, // Width of the card
-            height: 150, // Height of the card
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  // Image that fills the card
-                  Image.asset(
-                    "assets/lottie/images/card.png",
-                    fit: BoxFit.cover, // Ensures the image fills the card
-                  ),
-                  // Overlay for text and button
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            Colors.black.withOpacity(0.7),
-                            Colors.transparent,
-                          ],
-                        ),
+              height: 150, // Height of the slider
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 3, // Example: 3 cards for the slider
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Support Cancer Warriors",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            "Donate \$20 to help your nearest hospital.",
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.white70,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 4),
-                          TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              minimumSize: Size(50, 30),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                            child: Text(
-                              "Donate",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.greenAccent,
-                                fontWeight: FontWeight.w600,
+                      child: Container(
+                        width: 250, // Width of the card
+                        height: 150, // Height of the card
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              // Image that fills the card
+                              Image.asset(
+                                "assets/images/card.png",
+                                fit: BoxFit.cover, // Ensures the image fills the card
+                              ),
+                              // Overlay for text and button
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
+                                      colors: [
+                                        Colors.black.withOpacity(0.7),
+                                        Colors.transparent,
+                                      ],
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Support Cancer Warriors",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        "Donate \$20 to help your nearest hospital.",
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.white70,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      SizedBox(height: 4),
+                                      TextButton(
+                                        onPressed: () {
+                                          // Navigate to DonationPage directly from here if needed
+                                        },
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.zero,
+                                          minimumSize: Size(50, 30),
+                                          tapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                        ),
+                                        child: Text(
+                                          "Donate",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.greenAccent,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -169,15 +181,11 @@ class _DashboardState extends State<Dashboard> {
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
             ),
-          );
-        },
-      ),
-    ),
             SizedBox(height: 20),
             Text(
               "Organizations:",
@@ -200,7 +208,8 @@ class _DashboardState extends State<Dashboard> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     image: DecorationImage(
-                      image: AssetImage("assets/lottie/images/nepal_medical.png"),
+                      image:
+                          AssetImage("assets/images/nepal_medical.png"),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -234,7 +243,7 @@ class _DashboardState extends State<Dashboard> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     image: DecorationImage(
-                      image: AssetImage("assets/lottie/images/trauma.png"),
+                      image: AssetImage("assets/images/trauma.png"),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -268,7 +277,7 @@ class _DashboardState extends State<Dashboard> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     image: DecorationImage(
-                      image: AssetImage("assets/lottie/images/cancer.png"),
+                      image: AssetImage("assets/images/cancer.png"),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -292,34 +301,6 @@ class _DashboardState extends State<Dashboard> {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.grey,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-            backgroundColor: Colors.green,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.card_giftcard),
-            label: "Donation",
-            backgroundColor: Colors.yellow,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: "Notification",
-            backgroundColor: Colors.red,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Profile",
-            backgroundColor: Colors.lightBlue,
-          ),
-        ],
       ),
     );
   }

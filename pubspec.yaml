@@ -62,15 +62,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/lottie/loading.json
-    - assets/lottie/images/logo.png
-    - assets/lottie/images/google.png
-    - assets/lottie/images/facebook.png
-    - assets/lottie/images/child.png
-    - assets/lottie/images/nepal_medical.png
-    - assets/lottie/images/trauma.png
-    - assets/lottie/images/cancer.png
-    - assets/lottie/images/card.png
+    - assets/images/
+    - assets/lottie/
+  
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
