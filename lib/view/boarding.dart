@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jeevandaan/view/login.dart';
 import 'package:jeevandaan/view/signup.dart';
+//this is boardingscreen
 
 class BoardingScreen extends StatefulWidget {
   const BoardingScreen({Key? key}) : super(key: key);
