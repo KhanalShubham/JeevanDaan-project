@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:jeevandaan/view/dashboard.dart';
 import 'package:jeevandaan/view/signup.dart';
+import 'package:jeevandaan/view/widget/mainnavigation.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -155,7 +156,7 @@ class _LoginState extends State<Login> {
                             const SnackBar(
                                 content: Text("Logged in successfully")),
                           );
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Dashboard()));
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainNavigation()));
                         }
                       },
                       child: const Text(

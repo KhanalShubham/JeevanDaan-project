@@ -1,3 +1,5 @@
+
+
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:jeevandaan/view/boarding.dart';
@@ -14,7 +16,7 @@ class SplashScreen extends StatelessWidget {
         children: [
           // Logo image
           Image.asset(
-            'assets/lottie/images/logo.png',
+            'assets/images/logo.png',
             width: 120,
             height: 120,
             fit: BoxFit.contain,
