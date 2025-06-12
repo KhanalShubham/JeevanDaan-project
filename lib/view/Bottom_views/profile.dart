@@ -76,8 +76,8 @@ class ProfilePage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildStatColumn("Total Donated", "\$${totalDonated.toStringAsFixed(2)}"),
-                        _buildStatColumn("Patients Supported", patientsSupported.toString()),
+                        _buildStatColumn("Donated", "\$${totalDonated.toStringAsFixed(2)}"),
+                        _buildStatColumn("Supported", patientsSupported.toString()),
                         _buildStatColumn("Donations Made", donationCount.toString()),
                       ],
                     ),
