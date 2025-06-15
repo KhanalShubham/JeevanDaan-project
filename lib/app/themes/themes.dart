@@ -1,15 +1,8 @@
-// import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-// ThemeData getApplicationTheme() {
-//   return ThemeData(
-//     useMaterial3: false,
-//     primarySwatch: Colors.green,
-//     appBarTheme: const AppBarTheme(
-//       centerTitle: true,
-//       elevation: 0,
-//       backgroundColor: Colors.green,
-//     ),
-   
-//     fontFamily: "poppins",
-//   );
-// }
+class ThemeConstant {
+  ThemeConstant._();
+  static const Color darkPrimaryColor = Colors.yellow;
+  static const Color primaryColor = Colors.green;
+  static const Color appBarColor = Colors.green;
+}
