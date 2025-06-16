@@ -14,7 +14,7 @@ class UserLocalRepositoryImpl implements UserRepository{
 
   @override
   UserEntity? getUser(String email) {
-    final UserModel=localDataSource.getUser(email);
-    return UserModel?.toEntity();
+    final userModel=localDataSource.getUser(email);
+    return userModel?.toEntity();
   }
 }
