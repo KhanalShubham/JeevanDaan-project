@@ -3,9 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jeevandaan/app/service_locator/service_locator.dart';
 import 'package:jeevandaan/features/splash/presentation/view/splash_view.dart';
 import 'package:jeevandaan/features/splash/presentation/view_model/splash_view_model.dart';
-import 'package:jeevandaan/features/user/presentation/view/login.dart';
-import 'package:jeevandaan/features/user/presentation/view_model/login_view_model/login_view_model.dart';
-
 class App extends StatelessWidget {
   const App({super.key});
 
@@ -19,8 +16,8 @@ class App extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: BlocProvider.value(
-        value: serviceLocator<LoginViewModel>(),
-        child: LoginView(),
+        value: serviceLocator<SplashViewModel>(),
+        child: SplashView(),
       ),
     );
   }
