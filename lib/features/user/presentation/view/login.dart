@@ -4,6 +4,7 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:jeevandaan/features/user/presentation/view_model/login_view_model/login_event.dart';
 import 'package:jeevandaan/features/user/presentation/view_model/login_view_model/login_state.dart';
 import 'package:jeevandaan/features/user/presentation/view_model/login_view_model/login_view_model.dart';
+
 class Login extends StatelessWidget {
   const Login({super.key});
 
@@ -49,6 +50,7 @@ class _LoginViewState extends State<LoginView> {
                 ),
               );
             }
+            // Navigation is handled in LoginViewModel, so no need to add navigation here
           },
           builder: (context, state) {
             return SingleChildScrollView(
@@ -156,18 +158,17 @@ class _LoginViewState extends State<LoginView> {
                       // Forget Password
                       Align(
                         alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            context.read<LoginViewModel>().add(
-                                  ForgotPasswordEvent(context: context),
-                                );
-                          },
-                          child: const Text(
-                            "Forgot Password?",
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.w400,
-                            ),
+                        // child: TextButton(
+                        //   onPressed: () {
+                        //     context.read<LoginViewModel>().add(
+                        //           ForgottenPasswordEvent(context: context),
+                        //         );
+                        //   },
+                        child: const Text(
+                          "Forgot Password?",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
                       ),
@@ -268,7 +269,7 @@ class _LoginViewState extends State<LoginView> {
                               context.read<LoginViewModel>().add(
                                     SocialLoginEvent(
                                       context: context,
-                                      provider: 'gmail',
+                                      provider: 'google', // Changed to 'google' for consistency
                                     ),
                                   );
                             },
@@ -325,9 +326,9 @@ class _LoginViewState extends State<LoginView> {
                 ),
               ),
             );
-          },
-        ),
-      ),
+          }
+        )
+      )
     );
   }
 }

@@ -14,39 +14,40 @@ class SplashView extends StatelessWidget {
     });
 
     return Scaffold(
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Logo image
-          Image.asset(
-            'assets/images/logo.png',
-            width: 120,
-            height: 120,
-            fit: BoxFit.contain,
-          ),
-          // App name
-          const Padding(
-            padding: EdgeInsets.only(top: 140), // Adjust to position below logo
-            child: Text(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.white, // optional: set background color
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Logo image
+            Image.asset(
+              'assets/images/logo.png',
+              width: 120,
+              height: 120,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 20),
+            // App name
+            const Text(
               'Jeevan Daan',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 26,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
             ),
-          ),
-          // Loading animation
-          Padding(
-            padding: const EdgeInsets.only(top: 240), // Adjust to position below app name
-            child: Lottie.asset(
+            const SizedBox(height: 30),
+            // Loading animation
+            Lottie.asset(
               'assets/lottie/loading.json',
               width: 150,
               height: 150,
               fit: BoxFit.contain,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
