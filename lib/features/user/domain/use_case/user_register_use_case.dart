@@ -36,8 +36,10 @@ class RegisterUserParams extends Equatable {
 
   @override
   List<Object?> get props => [
+    name,
     email,
     contact,
+    disease,
     description,
     password,
   ];
@@ -58,7 +60,7 @@ class UserRegisterUseCase
       disease: params.disease,
       contact: params.contact,
       description: params.description,
-      password: params.password, userId: '',
+      password: params.password,
     );
     return _userRepository.registerUser(userEntity);
   }

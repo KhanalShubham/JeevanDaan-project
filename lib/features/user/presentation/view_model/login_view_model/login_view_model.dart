@@ -1,12 +1,24 @@
+// features/user/presentation/view_model/login_view_model/login_view_model.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jeevandaan/features/boarding/presentation/view/boarding_view.dart';
+import 'package:jeevandaan/features/boarding/presentation/view_model/boarding_view_model.dart';
+import 'package:jeevandaan/features/user/domain/repository/user_repository.dart';
+import 'package:jeevandaan/features/user/domain/use_case/user_login_use_case.dart';
+import 'package:jeevandaan/features/user/presentation/view/login.dart';
 import 'package:jeevandaan/features/user/presentation/view/signup.dart';
 import 'package:jeevandaan/features/user/presentation/view_model/login_view_model/login_event.dart';
 import 'package:jeevandaan/features/user/presentation/view_model/login_view_model/login_state.dart';
-import 'package:jeevandaan/view/widget/mainnavigation.dart';
 
 class LoginViewModel extends Bloc<LoginEvent, LoginState> {
-  LoginViewModel() : super(const LoginState.initial()) {
+  final UserLoginUseCase _userLoginUseCase;
+
+  // --- THIS IS THE CORRECT CONSTRUCTOR ---
+  // It should ONLY take UserLoginUseCase. Remove IUserRepository from here.
+  LoginViewModel({required UserLoginUseCase userLoginUseCase, required IUserRepository userRepository})
+      : _userLoginUseCase = userLoginUseCase,
+        super(const LoginState.initial()) {
     on<NavigateToSignupViewEvent>(_onNavigateToSignupView);
     on<NavigateToMainNavigationEvent>(_onNavigateToMainNavigation);
     on<LoginWithCredentialsEvent>(_onLoginWithCredentials);
@@ -15,6 +27,44 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
     on<SocialLoginEvent>(_onSocialLogin);
   }
 
+  void _onLoginWithCredentials(
+    LoginWithCredentialsEvent event,
+    Emitter<LoginState> emit,
+  ) async {
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+
+    final result = await _userLoginUseCase(
+      UserLoginParams(
+        email: event.email,
+        password: event.password,
+      ),
+    );
+
+    result.fold(
+      (failure) {
+        emit(state.copyWith(
+          isLoading: false,
+          isSuccess: false,
+          errorMessage: failure.message,
+        ));
+        if (event.context.mounted) {
+          ScaffoldMessenger.of(event.context).showSnackBar(
+            SnackBar(
+              content: Text(failure.message),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      (token) {
+        emit(state.copyWith(isLoading: false, isSuccess: true));
+        add(NavigateToMainNavigationEvent(context: event.context));
+      },
+    );
+  }
+
+  // ... rest of the file is unchanged ...
+  // ...
   void _onNavigateToSignupView(
     NavigateToSignupViewEvent event,
     Emitter<LoginState> emit,
@@ -34,48 +84,17 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
     Emitter<LoginState> emit,
   ) {
     if (event.context.mounted) {
-      Navigator.pushReplacement(
-        event.context,
-        MaterialPageRoute(
-          builder: (context) => MainNavigation(),
-        ),
-      );
-    }
-  }
+      Navigator.pushAndRemoveUntil(
+      event.context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider.value(
+          value: serviceLocator<BoardingViewModel>(),
+          child: const BoardingView(),
+      ),
+  ),
+  (route) => false,
+);
 
-  void _onLoginWithCredentials(
-    LoginWithCredentialsEvent event,
-    Emitter<LoginState> emit,
-  ) async {
-    emit(state.copyWith(isLoading: true, errorMessage: null));
-
-    try {
-      // TODO: Replace mock login with actual login logic using your authentication service
-      await Future.delayed(const Duration(seconds: 2));
-
-      emit(state.copyWith(isLoading: false, isSuccess: true));
-      
-      if (event.context.mounted) {
-        ScaffoldMessenger.of(event.context).showSnackBar(
-          const SnackBar(content: Text("Logged in successfully")),
-        );
-        add(NavigateToMainNavigationEvent(context: event.context));
-      }
-    } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        isSuccess: false,
-        errorMessage: e.toString(),
-      ));
-      
-      if (event.context.mounted) {
-        ScaffoldMessenger.of(event.context).showSnackBar(
-          SnackBar(
-            content: Text("Login failed: ${e.toString()}"),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
     }
   }
 

@@ -7,9 +7,9 @@ class LoginState extends Equatable {
   final String? errorMessage;
 
   const LoginState({
-    required this.isLoading,
-    required this.isSuccess,
-    required this.obscureText,
+    this.isLoading = false,
+    this.isSuccess = false,
+    this.obscureText = true,
     this.errorMessage,
   });
 

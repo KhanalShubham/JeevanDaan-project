@@ -34,25 +34,10 @@ class UserApiModel extends Equatable {
         description = '',
         password = '';
 
-  factory UserApiModel.fromJson(Map<String, dynamic> json) => UserApiModel(
-        userId: json['_id'] as String?,
-        name: json['name'] as String,
-        email: json['email'] as String,
-        disease: json['disease'] as String,
-        contact: json['contact'] as String,
-        description: json['description'] as String,
-        password: json['password'] as String?,
-      );
+  factory UserApiModel.fromJson(Map<String, dynamic> json) =>
+      _$UserApiModelFromJson(json);
 
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        '_id': userId,
-        'name': name,
-        'email': email,
-        'disease': disease,
-        'contact': contact,
-        'description': description,
-        'password': password,
-      };
+  Map<String, dynamic> toJson() => _$UserApiModelToJson(this);
 
   static UserApiModel fromEntity(UserEntity entity) => UserApiModel(
         name: entity.name,
@@ -60,6 +45,7 @@ class UserApiModel extends Equatable {
         disease: entity.disease,
         contact: entity.contact,
         description: entity.description,
+        password: entity.password,
       );
 
   UserEntity toEntity() => UserEntity(

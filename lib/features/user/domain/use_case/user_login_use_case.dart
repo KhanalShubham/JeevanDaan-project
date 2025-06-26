@@ -1,33 +1,49 @@
+// features/user/domain/use_case/user_login_use_case.dart
 
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
+import 'package:jeevandaan/app/shared_pref/token_shared_prefs.dart';
 import 'package:jeevandaan/app/use_case/usecase.dart';
 import 'package:jeevandaan/core/error/failure.dart';
 import 'package:jeevandaan/features/user/domain/repository/user_repository.dart';
 
-class LoginParams extends Equatable {
+// Use a more specific name to avoid conflicts
+class UserLoginParams extends Equatable {
   final String email;
   final String password;
 
-  const LoginParams({required this.email, required this.password});
+  const UserLoginParams({required this.email, required this.password});
 
-  // Initial Constructor
-  const LoginParams.initial() : email = '', password = '';
   @override
   List<Object?> get props => [email, password];
 }
 
-class UserLoginUseCase implements UsecaseWithParams<String, LoginParams> {
+class UserLoginUseCase implements UsecaseWithParams<String, UserLoginParams> {
   final IUserRepository _userRepository;
+  final TokenSharedPrefs _tokenSharedPrefs;
 
-  UserLoginUseCase({required IUserRepository userRepository})
-    : _userRepository = userRepository;
+  UserLoginUseCase({
+    required IUserRepository userRepository,
+    required TokenSharedPrefs tokenSharedPrefs,
+  })  : _userRepository = userRepository,
+        _tokenSharedPrefs = tokenSharedPrefs;
 
   @override
-  Future<Either<Failure, String>> call(LoginParams params) async {
-    return await _userRepository.login(
+  Future<Either<Failure, String>> call(UserLoginParams params) async {
+    final result = await _userRepository.login(
       params.email,
       params.password,
+    );
+
+    // This is a cleaner and safer way to handle the result
+    return result.fold(
+      (failure) => Left(failure), // If login failed, return the failure
+      (token) async {
+        // If login succeeded, save the token...
+        await _tokenSharedPrefs.saveToken(token);
+        // ...and then return the token.
+        return Right(token);
+      },
     );
   }
 }

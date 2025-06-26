@@ -1,62 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:equatable/equatable.dart';
 
-@immutable
-sealed class SignupEvent {}
+abstract class SignupEvent extends Equatable {
+  const SignupEvent();
 
-class NavigateBackEvent extends SignupEvent {
-  final BuildContext context;
-
-  NavigateBackEvent({required this.context});
+  @override
+  List<Object?> get props => [];
 }
 
-class SignupWithCredentialsEvent extends SignupEvent {
-  final BuildContext context;
+// Event for when the user taps the 'Continue' or 'Create Account' button
+class SignupNextStepTapped extends SignupEvent {
+  // Pass all controllers' text to the ViewModel for validation
   final String name;
   final String email;
-  final String phone;
   final String password;
-  final String gender;
+  final String contact;
+  final String disease;
+  final String description;
 
-  SignupWithCredentialsEvent({
-    required this.context,
+  const SignupNextStepTapped({
     required this.name,
     required this.email,
     required this.password,
-    required this.phone,
-    required this.gender,
+    required this.contact,
+    required this.disease,
+    required this.description,
   });
+
+  @override
+  List<Object?> get props => [name, email, password, contact, disease, description];
 }
 
-class UpdateGenderEvent extends SignupEvent {
-  final String? gender;
-
-  UpdateGenderEvent({required this.gender});
-}
-
-class ToggleTermsAgreementEvent extends SignupEvent {
-  final bool agreed;
-
-  ToggleTermsAgreementEvent({required this.agreed});
-}
-
-class ValidateFormEvent extends SignupEvent {}
-
-class SocialSignupEvent extends SignupEvent {
+// Event for when the user taps the back arrow
+class SignupPreviousStepTapped extends SignupEvent {
   final BuildContext context;
-  final String provider; // 'google', 'facebook'
-
-  SocialSignupEvent({
-    required this.context,
-    required this.provider,
-  });
+  const SignupPreviousStepTapped({required this.context});
+  @override
+  List<Object?> get props => [context];
 }
 
-class ShowTermsEvent extends SignupEvent {
+// Event for toggling the checkbox
+class SignupTermsToggled extends SignupEvent {
+  final bool hasAgreed;
+  const SignupTermsToggled({required this.hasAgreed});
+  @override
+  List<Object?> get props => [hasAgreed];
+}
+
+// Event for showing terms/privacy pop-up (this can stay the same)
+class SignupShowTermsTapped extends SignupEvent {
   final BuildContext context;
   final String type; // 'terms' or 'privacy'
 
-  ShowTermsEvent({
+  const SignupShowTermsTapped({
     required this.context,
     required this.type,
   });
+
+  @override
+  List<Object?> get props => [context, type];
 }

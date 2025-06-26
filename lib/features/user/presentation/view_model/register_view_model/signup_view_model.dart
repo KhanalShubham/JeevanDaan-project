@@ -1,187 +1,145 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'signup_event.dart';
-import 'signup_state.dart';
-// Import your required dependencies
-// import 'package:your_app/core/usecases/signup_usecase.dart';
+import 'package:jeevandaan/features/user/domain/use_case/user_register_use_case.dart';
+import 'package:jeevandaan/features/user/presentation/view_model/register_view_model/signup_event.dart';
+import 'package:jeevandaan/features/user/presentation/view_model/register_view_model/signup_state.dart';
 
 class SignupViewModel extends Bloc<SignupEvent, SignupState> {
-  // Uncomment and inject your use case when ready
-  // final SignupUsecase _signupUsecase;
+  final UserRegisterUseCase _userRegisterUseCase;
 
-  SignupViewModel(
-    // this._signupUsecase
-  ) : super(const SignupState.initial()) {
-    on<NavigateBackEvent>(_onNavigateBack);
-    on<SignupWithCredentialsEvent>(_onSignupWithCredentials);
-    on<UpdateGenderEvent>(_onUpdateGender);
-    on<ToggleTermsAgreementEvent>(_onToggleTermsAgreement);
-    on<ValidateFormEvent>(_onValidateForm);
-    on<SocialSignupEvent>(_onSocialSignup);
-    on<ShowTermsEvent>(_onShowTerms);
+  // CHANGED: The ViewModel now takes the UseCase directly.
+  SignupViewModel({required UserRegisterUseCase userRegisterUseCase})
+      : _userRegisterUseCase = userRegisterUseCase,
+        super(const SignupState.initial()) {
+    on<SignupNextStepTapped>(_onNextStepTapped);
+    on<SignupPreviousStepTapped>(_onPreviousStepTapped);
+    on<SignupTermsToggled>(_onTermsToggled);
+    on<SignupShowTermsTapped>(_onShowTermsTapped);
   }
 
-  void _onNavigateBack(
-    NavigateBackEvent event,
-    Emitter<SignupState> emit,
-  ) {
-    if (event.context.mounted) {
+  // All validation logic is now private to the ViewModel
+  bool _isValidName(String name) => name.isNotEmpty;
+  bool _isValidEmail(String email) => RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  bool _isValidContact(String contact) => RegExp(r'^[0-9]{6,15}$').hasMatch(contact);
+  bool _isValidPassword(String password) => RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$').hasMatch(password);
+  bool _isValidDisease(String disease) => disease.isNotEmpty;
+  bool _isValidDescription(String description) => description.isNotEmpty;
+
+
+  void _onNextStepTapped(SignupNextStepTapped event, Emitter<SignupState> emit) async {
+    // Clear any previous error message
+    emit(state.copyWith(clearErrorMessage: true));
+    
+    // Logic for handling the main button press
+    switch (state.currentStep) {
+      case 0:
+        if (!_isValidName(event.name)) {
+          emit(state.copyWith(errorMessage: 'Please enter your name'));
+          return;
+        }
+        break;
+      case 1:
+        if (!_isValidEmail(event.email)) {
+          emit(state.copyWith(errorMessage: 'Please enter a valid email'));
+          return;
+        }
+        break;
+      case 2:
+        if (!_isValidPassword(event.password)) {
+          emit(state.copyWith(errorMessage: 'Password must be 8+ chars & include uppercase, number, and symbol'));
+          return;
+        }
+        break;
+      case 3:
+        if (!_isValidContact(event.contact)) {
+          emit(state.copyWith(errorMessage: 'Please enter a valid contact number'));
+          return;
+        }
+        break;
+      case 4:
+        if (!_isValidDisease(event.disease)) {
+          emit(state.copyWith(errorMessage: 'Please enter your disease'));
+          return;
+        }
+        break;
+      case 5:
+        if (!_isValidDescription(event.description)) {
+          emit(state.copyWith(errorMessage: 'Please enter a description'));
+          return;
+        }
+        break;
+      case 6:
+        if (!state.agreeToTerms) {
+          emit(state.copyWith(errorMessage: 'You must agree to the terms to continue'));
+          return;
+        }
+        // If all is well on the last step, submit the form
+        await _submitRegistration(event, emit);
+        return; // Exit here to prevent advancing step after submission
+    }
+    
+    // If validation for the current step passes, advance to the next step
+    if (state.currentStep < 6) {
+      emit(state.copyWith(currentStep: state.currentStep + 1));
+    }
+  }
+
+  Future<void> _submitRegistration(SignupNextStepTapped event, Emitter<SignupState> emit) async {
+    emit(state.copyWith(isLoading: true));
+
+    final result = await _userRegisterUseCase(
+      RegisterUserParams(
+        name: event.name,
+        email: event.email,
+        contact: event.contact,
+        password: event.password,
+        disease: event.disease,
+        description: event.description,
+      ),
+    );
+
+    result.fold(
+      (failure) {
+        emit(state.copyWith(isLoading: false, errorMessage: failure.message));
+      },
+      (_) {
+        emit(state.copyWith(isLoading: false, isSuccess: true));
+        // We handle navigation in the listener in the View
+      },
+    );
+  }
+
+  void _onPreviousStepTapped(SignupPreviousStepTapped event, Emitter<SignupState> emit) {
+    if (state.currentStep > 0) {
+      emit(state.copyWith(currentStep: state.currentStep - 1, clearErrorMessage: true));
+    } else {
+      // If on the first step, pop the screen
       Navigator.pop(event.context);
     }
   }
 
-  void _onSignupWithCredentials(
-    SignupWithCredentialsEvent event,
-    Emitter<SignupState> emit,
-  ) async {
-    emit(state.copyWith(isLoading: true, errorMessage: null));
-
-    try {
-      // Replace this with your actual signup logic
-      // final result = await _signupUsecase(
-      //   SignupParams(
-      //     name: event.name,
-      //     email: event.email,
-      //     phone: event.phone,
-      //     gender: event.gender,
-      //   ),
-      // );
-
-      // Simulate API call for now
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Mock success - replace with actual result handling
-      // result.fold(
-      //   (failure) {
-      //     emit(state.copyWith(
-      //       isLoading: false,
-      //       isSuccess: false,
-      //       errorMessage: failure.message,
-      //     ));
-      //     
-      //     if (event.context.mounted) {
-      //       ScaffoldMessenger.of(event.context).showSnackBar(
-      //         SnackBar(
-      //           content: Text(failure.message),
-      //           backgroundColor: Colors.red,
-      //         ),
-      //       );
-      //     }
-      //   },
-      //   (success) {
-      //     emit(state.copyWith(isLoading: false, isSuccess: true));
-      //     
-      //     if (event.context.mounted) {
-      //       ScaffoldMessenger.of(event.context).showSnackBar(
-      //         const SnackBar(content: Text("Sign up successful!")),
-      //       );
-      //       Navigator.pop(event.context);
-      //     }
-      //   },
-      // );
-
-      // Mock implementation
-      emit(state.copyWith(isLoading: false, isSuccess: true));
-      
-      if (event.context.mounted) {
-        ScaffoldMessenger.of(event.context).showSnackBar(
-          const SnackBar(content: Text("Sign up successful!")),
-        );
-        Navigator.pop(event.context);
-      }
-    } catch (e) {
-      emit(state.copyWith(
-        isLoading: false,
-        isSuccess: false,
-        errorMessage: e.toString(),
-      ));
-      
-      if (event.context.mounted) {
-        ScaffoldMessenger.of(event.context).showSnackBar(
-          SnackBar(
-            content: Text("Signup failed: ${e.toString()}"),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
+  void _onTermsToggled(SignupTermsToggled event, Emitter<SignupState> emit) {
+    emit(state.copyWith(agreeToTerms: event.hasAgreed));
   }
-
-  void _onUpdateGender(
-    UpdateGenderEvent event,
-    Emitter<SignupState> emit,
-  ) {
-    emit(state.copyWith(selectedGender: event.gender));
-    add(ValidateFormEvent());
-  }
-
-  void _onToggleTermsAgreement(
-    ToggleTermsAgreementEvent event,
-    Emitter<SignupState> emit,
-  ) {
-    emit(state.copyWith(agreeToTerms: event.agreed));
-    add(ValidateFormEvent());
-  }
-
-  void _onValidateForm(
-    ValidateFormEvent event,
-    Emitter<SignupState> emit,
-  ) {
-    // Form validation logic will be handled in the UI layer
-    // This event can be used to trigger validation checks
-    bool isValid = state.agreeToTerms && state.selectedGender != null;
-    emit(state.copyWith(isFormValid: isValid));
-  }
-
-  void _onSocialSignup(
-    SocialSignupEvent event,
-    Emitter<SignupState> emit,
-  ) {
-    // Handle social signup logic
-    if (event.context.mounted) {
-      ScaffoldMessenger.of(event.context).showSnackBar(
-        SnackBar(content: Text("${event.provider} sign up tapped")),
-      );
-    }
-  }
-
-  void _onShowTerms(
-    ShowTermsEvent event,
-    Emitter<SignupState> emit,
-  ) {
-    // Handle showing terms and conditions or privacy policy
+  
+  void _onShowTermsTapped(SignupShowTermsTapped event, Emitter<SignupState> emit) {
     if (event.context.mounted) {
       showDialog(
         context: event.context,
-        builder: (context) => AlertDialog(
-          title: Text(event.type == 'terms' ? 'Terms of Service' : 'Privacy Policy'),
-          content: Text(
-            event.type == 'terms'
-                ? 'Terms of service content goes here...'
-                : 'Privacy policy content goes here...',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ],
-        ),
+        builder: (context) {
+          // Replace the following with your actual dialog widget
+          return AlertDialog(
+            title: Text('Terms and Conditions'),
+            content: Text('Your terms and conditions go here.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Close'),
+              ),
+            ],
+          );
+        },
       );
     }
   }
-
-  // Validation helper methods
-  bool isValidEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
-  }
-
-  bool isValidPhone(String phone) {
-    return RegExp(r'^[0-9]{6,15}$').hasMatch(phone);
-  }
-  bool isValidPasswordRegEx(String password) {
-  // Minimum 8 characters, at least one uppercase, one lowercase, one digit, and one special character
-  return RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$')
-      .hasMatch(password);
-}
 }

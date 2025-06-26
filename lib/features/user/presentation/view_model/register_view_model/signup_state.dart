@@ -1,76 +1,51 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 
 class SignupState extends Equatable {
   final bool isLoading;
   final bool isSuccess;
-  final bool isFormValid;
-  final bool agreeToTerms;
-  final String? selectedGender;
   final String? errorMessage;
-  final List<String> genderOptions;
+  final bool agreeToTerms;
+  final int currentStep; // ADDED: To manage the stepper UI
 
   const SignupState({
     required this.isLoading,
     required this.isSuccess,
-    required this.isFormValid,
-    required this.agreeToTerms,
-    this.selectedGender,
     this.errorMessage,
-    required this.genderOptions,
+    required this.agreeToTerms,
+    required this.currentStep,
   });
 
+  // The initial state of the screen
   const SignupState.initial()
       : isLoading = false,
         isSuccess = false,
-        isFormValid = false,
-        agreeToTerms = false,
-        selectedGender = null,
         errorMessage = null,
-        genderOptions = const ['Male', 'Female', 'Others'];
+        agreeToTerms = false,
+        currentStep = 0; // Starts at the first step
 
   SignupState copyWith({
     bool? isLoading,
     bool? isSuccess,
-    bool? isFormValid,
-    bool? agreeToTerms,
-    String? selectedGender,
     String? errorMessage,
-    List<String>? genderOptions,
+    bool? agreeToTerms,
+    int? currentStep,
+    bool clearErrorMessage = false, // Helper to clear old errors
   }) {
     return SignupState(
       isLoading: isLoading ?? this.isLoading,
       isSuccess: isSuccess ?? this.isSuccess,
-      isFormValid: isFormValid ?? this.isFormValid,
+      errorMessage: clearErrorMessage ? null : errorMessage ?? this.errorMessage,
       agreeToTerms: agreeToTerms ?? this.agreeToTerms,
-      selectedGender: selectedGender ?? this.selectedGender,
-      errorMessage: errorMessage ?? this.errorMessage,
-      genderOptions: genderOptions ?? this.genderOptions,
+      currentStep: currentStep ?? this.currentStep,
     );
-  }
-
-  // Helper method to get appropriate icon based on selected gender
-  IconData getGenderIcon() {
-    switch (selectedGender) {
-      case 'Male':
-        return Icons.man;
-      case 'Female':
-        return Icons.woman;
-      case 'Others':
-        return Icons.transgender;
-      default:
-        return Icons.people;
-    }
   }
 
   @override
   List<Object?> get props => [
         isLoading,
         isSuccess,
-        isFormValid,
-        agreeToTerms,
-        selectedGender,
         errorMessage,
-        genderOptions,
+        agreeToTerms,
+        currentStep,
       ];
 }

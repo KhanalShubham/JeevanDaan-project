@@ -5,8 +5,6 @@ import 'package:jeevandaan/features/boarding/presentation/view_model/boarding_st
 import 'package:jeevandaan/features/boarding/presentation/view_model/boarding_view_model.dart';
 import 'package:jeevandaan/features/user/presentation/view/login.dart';
 import 'package:jeevandaan/features/user/presentation/view/signup.dart';
-import 'package:jeevandaan/features/user/presentation/view_model/login_view_model/login_view_model.dart';
-import 'package:jeevandaan/features/user/presentation/view_model/register_view_model/signup_view_model.dart';
 
 class BoardingView extends StatelessWidget {
   const BoardingView({super.key});
@@ -19,28 +17,24 @@ class BoardingView extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => BlocProvider<SignupViewModel>(
-                create: (context) => SignupViewModel(),
-                child: const SignupView(),
-              ),
+              builder: (context) => const Signup(),
             ),
           ).then((_) {
-            // Reset the navigateToSignup state after navigation
-            context.read<BoardingViewModel>().add(const NavigateToSignupEvent());
+            // --- THIS IS THE KEY CHANGE ---
+            // After returning from the Signup screen, dispatch the new, clear event.
+            context.read<BoardingViewModel>().add(const ResetNavigationEvent());
           });
         }
         if (state.navigateToLogin) {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => BlocProvider<LoginViewModel>(
-                create: (context) => LoginViewModel(),
-                child: const LoginView(),
-              ),
+              builder: (context) => const Login(),
             ),
           ).then((_) {
-            // Reset the navigateToLogin state after navigation
-            context.read<BoardingViewModel>().add(const NavigateToLoginEvent());
+            // --- THIS IS THE KEY CHANGE ---
+            // Do the same for the Login navigation flow.
+            context.read<BoardingViewModel>().add(const ResetNavigationEvent());
           });
         }
       },
@@ -52,6 +46,7 @@ class BoardingView extends StatelessWidget {
           child: SafeArea(
             child: Column(
               children: [
+                // Your UI code remains unchanged...
                 const Spacer(flex: 2),
                 const Text(
                   'Welcome',

@@ -1,46 +1,66 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-@immutable
-sealed class LoginEvent {}
+abstract class LoginEvent extends Equatable {
+  const LoginEvent();
+
+  @override
+  List<Object?> get props => [];
+}
 
 class NavigateToSignupViewEvent extends LoginEvent {
   final BuildContext context;
 
-  NavigateToSignupViewEvent({required this.context});
+  const NavigateToSignupViewEvent({required this.context});
+
+  @override
+  List<Object?> get props => [context];
 }
 
 class NavigateToMainNavigationEvent extends LoginEvent {
   final BuildContext context;
 
-  NavigateToMainNavigationEvent({required this.context});
+  const NavigateToMainNavigationEvent({required this.context});
+
+  @override
+  List<Object?> get props => [context];
 }
 
 class LoginWithCredentialsEvent extends LoginEvent {
-  final BuildContext context;
-  final String emailOrPhone;
+  final String email;
   final String password;
+  final BuildContext context;
 
-  LoginWithCredentialsEvent({
-    required this.context,
-    required this.emailOrPhone,
+  const LoginWithCredentialsEvent({
+    required this.email,
     required this.password,
+    required this.context,
   });
+
+  @override
+  List<Object?> get props => [email, password, context];
 }
 
-class TogglePasswordVisibilityEvent extends LoginEvent {}
+class TogglePasswordVisibilityEvent extends LoginEvent {
+  @override
+  List<Object?> get props => [];
+}
 
 class ForgotPasswordEvent extends LoginEvent {
   final BuildContext context;
 
-  ForgotPasswordEvent({required this.context});
+  const ForgotPasswordEvent({required this.context});
+
+  @override
+  List<Object?> get props => [context];
 }
 
 class SocialLoginEvent extends LoginEvent {
   final BuildContext context;
-  final String provider; // 'phone', 'gmail', 'facebook'
+  final String provider;
 
-  SocialLoginEvent({
-    required this.context,
-    required this.provider,
-  });
+  const SocialLoginEvent({required this.context, required this.provider});
+
+  @override
+  List<Object?> get props => [context, provider];
 }
