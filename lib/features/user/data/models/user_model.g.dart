@@ -18,26 +18,32 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
     };
     return UserModel(
       userId: fields[0] as String?,
-      email: fields[1] as String,
-      phone: fields[2] as String,
-      gender: fields[3] as String,
-      password: fields[4] as String,
+      name: fields[1] as String?,
+      email: fields[2] as String,
+      disease: fields[3] as String,
+      contact: fields[4] as String,
+      description: fields[5] as String,
+      password: fields[6] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.userId)
       ..writeByte(1)
-      ..write(obj.email)
+      ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.phone)
+      ..write(obj.email)
       ..writeByte(3)
-      ..write(obj.gender)
+      ..write(obj.disease)
       ..writeByte(4)
+      ..write(obj.contact)
+      ..writeByte(5)
+      ..write(obj.description)
+      ..writeByte(6)
       ..write(obj.password);
   }
 

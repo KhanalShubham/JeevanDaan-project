@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jeevandaan/features/boarding/presentation/view/boarding_view.dart';
+import 'package:jeevandaan/features/user/domain/repository/user_repository.dart';
+import 'package:jeevandaan/features/user/domain/use_case/user_login_use_case.dart';
 import 'package:jeevandaan/features/user/presentation/view/signup.dart';
 import 'package:jeevandaan/features/user/presentation/view_model/login_view_model/login_event.dart';
 import 'package:jeevandaan/features/user/presentation/view_model/login_view_model/login_state.dart';
-import 'package:jeevandaan/view/widget/mainnavigation.dart';
 
 class LoginViewModel extends Bloc<LoginEvent, LoginState> {
-  LoginViewModel() : super(const LoginState.initial()) {
+  final UserLoginUseCase _userLoginUseCase;
+
+  LoginViewModel({required IUserRepository userRepository})
+      : _userLoginUseCase = UserLoginUseCase(userRepository: userRepository),
+        super(const LoginState.initial()) {
     on<NavigateToSignupViewEvent>(_onNavigateToSignupView);
     on<NavigateToMainNavigationEvent>(_onNavigateToMainNavigation);
     on<LoginWithCredentialsEvent>(_onLoginWithCredentials);
@@ -37,7 +43,7 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
       Navigator.pushReplacement(
         event.context,
         MaterialPageRoute(
-          builder: (context) => MainNavigation(),
+          builder: (context) => const BoardingView(),
         ),
       );
     }
@@ -50,24 +56,45 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     try {
-      // TODO: Replace mock login with actual login logic using your authentication service
-      await Future.delayed(const Duration(seconds: 2));
+      final result = await _userLoginUseCase(
+        LoginUserParams(
+          email: event.email,
+          password: event.password,
+        ),
+      );
 
-      emit(state.copyWith(isLoading: false, isSuccess: true));
-      
-      if (event.context.mounted) {
-        ScaffoldMessenger.of(event.context).showSnackBar(
-          const SnackBar(content: Text("Logged in successfully")),
-        );
-        add(NavigateToMainNavigationEvent(context: event.context));
-      }
+      result.fold(
+        (failure) {
+          emit(state.copyWith(
+            isLoading: false,
+            isSuccess: false,
+            errorMessage: failure.message,
+          ));
+          if (event.context.mounted) {
+            ScaffoldMessenger.of(event.context).showSnackBar(
+              SnackBar(
+                content: Text(failure.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        (_) {
+          emit(state.copyWith(isLoading: false, isSuccess: true));
+          if (event.context.mounted) {
+            ScaffoldMessenger.of(event.context).showSnackBar(
+              const SnackBar(content: Text("Logged in successfully")),
+            );
+            add(NavigateToMainNavigationEvent(context: event.context));
+          }
+        },
+      );
     } catch (e) {
       emit(state.copyWith(
         isLoading: false,
         isSuccess: false,
         errorMessage: e.toString(),
       ));
-      
       if (event.context.mounted) {
         ScaffoldMessenger.of(event.context).showSnackBar(
           SnackBar(

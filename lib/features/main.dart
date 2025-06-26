@@ -7,10 +7,10 @@ import 'package:jeevandaan/core/network/hive_services.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await HiveServices().init();
-  await initDependencies();
+  await initDependencies(); // Ensure dependencies are registered
   final box = await Hive.openBox('userBox');
-  for(var user in box.values){
+  for (var user in box.values) {
     debugPrint(user.toString());
   }
-  runApp(App());
+  runApp(const App());
 }

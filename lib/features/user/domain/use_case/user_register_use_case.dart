@@ -8,31 +8,39 @@ import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
 import 'package:jeevandaan/features/user/domain/repository/user_repository.dart';
 
 class RegisterUserParams extends Equatable {
+  final String name;
   final String email;
-  final String phone;
-  final String gender;
+  final String disease;
+  final String contact;
+  final String description;
   final String password;
 
   const RegisterUserParams({
+    required this.name,
     required this.email,
-    required this.phone,
-    required this.gender,
+    required this.disease,
+    required this.contact,
+    required this.description,
     required this.password
   });
 
   //intial constructor
   const RegisterUserParams.initial({
+    required this.name,
     required this.email,
-    required this.phone,
-    required this.gender,
+    required this.disease,
+    required this.contact,
+    required this.description,
     required this.password,
   });
 
   @override
   List<Object?> get props => [
+    name,
     email,
-    phone,
-    gender,
+    disease,
+    contact,
+    description,
     password,
   ];
 }
@@ -47,9 +55,11 @@ class UserRegisterUseCase
   @override
   Future<Either<Failure, void>> call(RegisterUserParams params) {
     final userEntity = UserEntity(
+      name: params.name,
       email: params.email,
-      phone: params.phone,
-      gender: params.gender,
+      disease: params.disease,
+      contact: params.contact,
+      description: params.description,
       password: params.password, userId: '',
     );
     return _userRepository.registerUser(userEntity);

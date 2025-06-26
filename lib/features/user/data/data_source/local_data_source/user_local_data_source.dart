@@ -12,7 +12,7 @@ class UserLocalDataSource implements IUserDataSource{
   Future<String>login(String email, String password)async{
     try{
       final userdata=await _hiveServices.login(email, password);
-      if(userdata!=null && userdata.password==password){
+      if(userdata.password==password){
         return "login successfull";
       }else{
         throw Exception("Invalid username or password");
