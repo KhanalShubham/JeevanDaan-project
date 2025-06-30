@@ -24,13 +24,17 @@ class UserRemoteRepositoryImpl implements IUserRepository {
     }
   }
 
-  @override
-  Future<Either<Failure, void>> registerUser(UserEntity user) async {
-    try {
-      await _userRemoteDatasource.registerUser(user);
-      return const Right(null);
-    } catch (e) {
-      return Left(RemoteDatabaseFailure(message: e.toString()));
-    }
+  // in UserRemoteRepositoryImpl
+
+@override
+Future<Either<Failure, void>> registerUser(UserEntity user) async {
+  try {
+    await _userRemoteDatasource.registerUser(user);
+    return const Right(null);
+  } catch (e) {
+    // e.toString() often includes "Exception: ". We can clean it up.
+    final errorMessage = e.toString().replaceFirst('Exception: ', '');
+    return Left(RemoteDatabaseFailure(message: errorMessage));
   }
+}
 }

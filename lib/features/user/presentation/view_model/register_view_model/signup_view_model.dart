@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jeevandaan/features/user/domain/use_case/user_register_use_case.dart';
 import 'package:jeevandaan/features/user/presentation/view_model/register_view_model/signup_event.dart';
@@ -7,10 +6,8 @@ import 'package:jeevandaan/features/user/presentation/view_model/register_view_m
 class SignupViewModel extends Bloc<SignupEvent, SignupState> {
   final UserRegisterUseCase _userRegisterUseCase;
 
-  // CHANGED: The ViewModel now takes the UseCase directly.
-  SignupViewModel({required UserRegisterUseCase userRegisterUseCase})
-      : _userRegisterUseCase = userRegisterUseCase,
-        super(const SignupState.initial()) {
+  SignupViewModel(this._userRegisterUseCase)
+      : super( SignupState.initial()) {
     on<SignupNextStepTapped>(_onNextStepTapped);
     on<SignupPreviousStepTapped>(_onPreviousStepTapped);
     on<SignupTermsToggled>(_onTermsToggled);
@@ -27,10 +24,8 @@ class SignupViewModel extends Bloc<SignupEvent, SignupState> {
 
 
   void _onNextStepTapped(SignupNextStepTapped event, Emitter<SignupState> emit) async {
-    // Clear any previous error message
     emit(state.copyWith(clearErrorMessage: true));
     
-    // Logic for handling the main button press
     switch (state.currentStep) {
       case 0:
         if (!_isValidName(event.name)) {
@@ -73,12 +68,10 @@ class SignupViewModel extends Bloc<SignupEvent, SignupState> {
           emit(state.copyWith(errorMessage: 'You must agree to the terms to continue'));
           return;
         }
-        // If all is well on the last step, submit the form
         await _submitRegistration(event, emit);
-        return; // Exit here to prevent advancing step after submission
+        return;
     }
     
-    // If validation for the current step passes, advance to the next step
     if (state.currentStep < 6) {
       emit(state.copyWith(currentStep: state.currentStep + 1));
     }
@@ -104,7 +97,6 @@ class SignupViewModel extends Bloc<SignupEvent, SignupState> {
       },
       (_) {
         emit(state.copyWith(isLoading: false, isSuccess: true));
-        // We handle navigation in the listener in the View
       },
     );
   }
@@ -113,33 +105,15 @@ class SignupViewModel extends Bloc<SignupEvent, SignupState> {
     if (state.currentStep > 0) {
       emit(state.copyWith(currentStep: state.currentStep - 1, clearErrorMessage: true));
     } else {
-      // If on the first step, pop the screen
-      Navigator.pop(event.context);
+      emit(state.copyWith(shouldPop: true));
     }
+  }
+  
+  void _onShowTermsTapped(SignupShowTermsTapped event, Emitter<SignupState> emit) {
+    emit(state.copyWith(showDialog: true, dialogType: event.type));
   }
 
   void _onTermsToggled(SignupTermsToggled event, Emitter<SignupState> emit) {
     emit(state.copyWith(agreeToTerms: event.hasAgreed));
-  }
-  
-  void _onShowTermsTapped(SignupShowTermsTapped event, Emitter<SignupState> emit) {
-    if (event.context.mounted) {
-      showDialog(
-        context: event.context,
-        builder: (context) {
-          // Replace the following with your actual dialog widget
-          return AlertDialog(
-            title: Text('Terms and Conditions'),
-            content: Text('Your terms and conditions go here.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('Close'),
-              ),
-            ],
-          );
-        },
-      );
-    }
   }
 }

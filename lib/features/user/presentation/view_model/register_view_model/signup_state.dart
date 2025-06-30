@@ -1,51 +1,62 @@
 import 'package:equatable/equatable.dart';
 
 class SignupState extends Equatable {
+  final int currentStep;
   final bool isLoading;
   final bool isSuccess;
   final String? errorMessage;
   final bool agreeToTerms;
-  final int currentStep; // ADDED: To manage the stepper UI
+
+  // These flags are for one-time events handled by the listener
+  final bool shouldPop;
+  final bool showDialog;
+  final String? dialogType; // e.g., 'terms' or 'privacy'
 
   const SignupState({
-    required this.isLoading,
-    required this.isSuccess,
+    this.currentStep = 0,
+    this.isLoading = false,
+    this.isSuccess = false,
     this.errorMessage,
-    required this.agreeToTerms,
-    required this.currentStep,
+    this.agreeToTerms = false,
+    this.shouldPop = false,
+    this.showDialog = false,
+    this.dialogType,
   });
 
-  // The initial state of the screen
-  const SignupState.initial()
-      : isLoading = false,
-        isSuccess = false,
-        errorMessage = null,
-        agreeToTerms = false,
-        currentStep = 0; // Starts at the first step
+  factory SignupState.initial() => const SignupState();
 
   SignupState copyWith({
+    int? currentStep,
     bool? isLoading,
     bool? isSuccess,
     String? errorMessage,
     bool? agreeToTerms,
-    int? currentStep,
-    bool clearErrorMessage = false, // Helper to clear old errors
+    bool? clearErrorMessage, // Special flag to nullify error
+    bool? shouldPop,
+    bool? showDialog,
+    String? dialogType,
   }) {
     return SignupState(
+      currentStep: currentStep ?? this.currentStep,
       isLoading: isLoading ?? this.isLoading,
       isSuccess: isSuccess ?? this.isSuccess,
-      errorMessage: clearErrorMessage ? null : errorMessage ?? this.errorMessage,
+      errorMessage: clearErrorMessage == true ? null : errorMessage ?? this.errorMessage,
       agreeToTerms: agreeToTerms ?? this.agreeToTerms,
-      currentStep: currentStep ?? this.currentStep,
+      shouldPop: shouldPop ?? false,
+      showDialog: showDialog ?? false,
+      dialogType: dialogType ?? this.dialogType,
     );
   }
 
   @override
   List<Object?> get props => [
+        currentStep,
         isLoading,
         isSuccess,
         errorMessage,
         agreeToTerms,
-        currentStep,
+        shouldPop,
+        showDialog,
+        dialogType,
       ];
 }

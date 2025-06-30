@@ -35,21 +35,24 @@ class UserRemoteDatasource implements IUserDataSource {
   Future<void> registerUser(UserEntity userdata) async {
     try {
       final userApiModel = UserApiModel.fromEntity(userdata);
-      final response = await _apiService.dio.post(
+      await _apiService.dio.post(
         ApiEndpoints.register,
         data: userApiModel.toJson(),
       );
-      if (response.statusCode == 200) {
-        return;
-      } else {
-        throw Exception(
-          "Failed to register user: ${response.statusMessage}",
-        );
-      }
+      // SIMPLIFIED LOGIC:
+      // By default, if dio.post() does NOT throw an exception, it means the
+      // status code was in the 2xx range (a success).
+      // So, we don't need to check the status code manually here.
+      // If the server returned 4xx or 5xx, Dio would have already thrown a DioException,
+      // which is caught below.
+      return; 
+
     } on DioException catch (e) {
-      throw Exception("Failed to register user: ${e.message}");
+      // This provides a much more specific and helpful error message.
+      throw Exception("API Error on registration: ${e.response?.data['message'] ?? e.message}");
     } catch (e) {
-      throw Exception("Failed to register user: $e");
+      // This will catch other errors, like a problem with toJson().
+      throw Exception("An unexpected error occurred: $e");
     }
   }
 }
