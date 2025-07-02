@@ -160,7 +160,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         validator: MultiValidator([
                           RequiredValidator(errorText: "Please enter your password"),
-                          MinLengthValidator(8,
+                          MinLengthValidator(6,
                               errorText: "Password must be at least 8 characters"),
                         ]),
                       ),

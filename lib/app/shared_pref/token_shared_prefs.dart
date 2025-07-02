@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:jeevandaan/core/error/failure.dart';
+import 'package:jeevandaan/core/error/failure.dart'; 
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TokenSharedPrefs {

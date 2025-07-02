@@ -1,16 +1,20 @@
+// lib/features/dashboard/presentation/view/mainnavigation.dart (Example)
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jeevandaan/features/dashboard/presentation/view_model/main_navigation_state.dart';
 import 'package:jeevandaan/features/dashboard/presentation/view_model/main_navigation_view_model.dart';
 
+// ... other imports for your Bottom_views, removed for brevity in this example ...
+
 class MainNavigation extends StatelessWidget {
-  const MainNavigation({super.key}); // Changed to const for better performance
+  const MainNavigation({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocBuilder<MainNavigationViewModel, MainNavigationState>(
         builder: (context, state) {
+          // This will now correctly show RequestView when selectedIndex is 1
           return state.views.elementAt(state.selectedIndex);
         },
       ),
@@ -23,13 +27,10 @@ class MainNavigation extends StatelessWidget {
                 label: 'Dashboard',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.request_page),
+                icon: Icon(Icons.request_page), // This is the Request button
                 label: 'Request',
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.message),
-                label: 'Message',
-              ),
+              BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Message'),
               BottomNavigationBarItem(
                 icon: Icon(Icons.notifications),
                 label: 'Notifications',
@@ -40,12 +41,11 @@ class MainNavigation extends StatelessWidget {
               ),
             ],
             currentIndex: state.selectedIndex,
-            // --- Design Enhancements ---
-            selectedItemColor: Theme.of(context).primaryColor, // Use your app's primary color
-            unselectedItemColor: Colors.grey[600], // A subtle grey for unselected items
-            backgroundColor: Theme.of(context).cardColor, // Or Colors.white, for the bar's background
-            type: BottomNavigationBarType.fixed, // Ensures all labels are always visible
-            elevation: 8.0, // Adds a subtle shadow
+            selectedItemColor: Theme.of(context).primaryColor,
+            unselectedItemColor: Colors.grey[600],
+            backgroundColor: Theme.of(context).cardColor,
+            type: BottomNavigationBarType.fixed,
+            elevation: 8.0,
             onTap: (index) {
               context.read<MainNavigationViewModel>().onTabTapped(index);
             },

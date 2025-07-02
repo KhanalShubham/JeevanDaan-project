@@ -1,13 +1,12 @@
-// features/user/domain/use_case/user_login_use_case.dart
+// features/user/domain/use_case/user_login_use_case.dart (Revised)
 
 import 'package:dartz/dartz.dart';
-import 'package:equatable/equatable.dart';
+import 'package:equatable/equatable.dart'; // Keep Equatable here for UserLoginParams
 import 'package:jeevandaan/app/shared_pref/token_shared_prefs.dart';
-import 'package:jeevandaan/app/use_case/usecase.dart';
+import 'package:jeevandaan/app/use_case/usecase.dart'; // Updated import for the fixed UsecaseWithParams
 import 'package:jeevandaan/core/error/failure.dart';
 import 'package:jeevandaan/features/user/domain/repository/user_repository.dart';
 
-// Use a more specific name to avoid conflicts
 class UserLoginParams extends Equatable {
   final String email;
   final String password;
@@ -35,13 +34,10 @@ class UserLoginUseCase implements UsecaseWithParams<String, UserLoginParams> {
       params.password,
     );
 
-    // This is a cleaner and safer way to handle the result
     return result.fold(
-      (failure) => Left(failure), // If login failed, return the failure
+      (failure) => Left(failure),
       (token) async {
-        // If login succeeded, save the token...
         await _tokenSharedPrefs.saveToken(token);
-        // ...and then return the token.
         return Right(token);
       },
     );
