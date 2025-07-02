@@ -58,7 +58,8 @@ dependencies:
   get_it: ^8.0.3
   flutter_bloc: ^9.1.1
   bloc: ^9.0.0
-  flutter_launcher_icons: ^0.14.4
+  flutter_secure_storage: ^9.2.2 
+  file_picker: ^10.2.0
 
 dev_dependencies:
   flutter_test:
@@ -112,10 +113,3 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: "AppIcon"
-  image_path: "assets/icons/icon.png"
-  min_sdk_andriod: 21
-  remove_alpha_ios: true

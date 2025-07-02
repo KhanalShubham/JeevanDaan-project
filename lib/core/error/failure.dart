@@ -18,6 +18,14 @@ class RemoteDatabaseFailure extends Failure {
   const RemoteDatabaseFailure({this.statusCode, required super.message});
 }
 
+// NEW: ServerFailure
+class ServerFailure extends Failure {
+  // You might want to include a statusCode here too,
+  // similar to RemoteDatabaseFailure, to give more context.
+  final int? statusCode;
+  const ServerFailure({this.statusCode, required super.message});
+}
+
 class SharedPreferencesFailure extends Failure {
   const SharedPreferencesFailure({required super.message});
 }

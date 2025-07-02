@@ -3,26 +3,31 @@ import 'package:jeevandaan/features/boarding/presentation/view_model/boarding_ev
 import 'package:jeevandaan/features/boarding/presentation/view_model/boarding_state.dart';
 
 class BoardingViewModel extends Bloc<BoardingEvent, BoardingState> {
-  BoardingViewModel() : super(const BoardingState()) {
-    on<CreateAccountHoverEvent>(_onCreateAccountHover);
-    on<LoginHoverEvent>(_onLoginHover);
-    on<NavigateToSignupEvent>(_onNavigateToSignup);
-    on<NavigateToLoginEvent>(_onNavigateToLogin);
-  }
+  // REFINED: Using the new .initial() constructor and inline event handlers.
+  BoardingViewModel() : super(const BoardingState.initial()) {
+    on<CreateAccountHoverEvent>((event, emit) {
+      emit(state.copyWith(isCreateAccountHovered: event.isHovered));
+    });
 
-  void _onCreateAccountHover(CreateAccountHoverEvent event, Emitter<BoardingState> emit) {
-    emit(state.copyWith(isCreateAccountHovered: event.isHovered));
-  }
+    on<LoginHoverEvent>((event, emit) {
+      emit(state.copyWith(isLoginHovered: event.isHovered));
+    });
 
-  void _onLoginHover(LoginHoverEvent event, Emitter<BoardingState> emit) {
-    emit(state.copyWith(isLoginHovered: event.isHovered));
-  }
+    on<NavigateToSignupEvent>((event, emit) {
+      emit(state.copyWith(navigateToSignup: true));
+    });
 
-  void _onNavigateToSignup(NavigateToSignupEvent event, Emitter<BoardingState> emit) {
-    emit(state.copyWith(navigateToSignup: true));
-  }
+    on<NavigateToLoginEvent>((event, emit) {
+      emit(state.copyWith(navigateToLogin: true));
+    });
 
-  void _onNavigateToLogin(NavigateToLoginEvent event, Emitter<BoardingState> emit) {
-    emit(state.copyWith(navigateToLogin: true));
+    // ADDED: Handler for the new reset event.
+    // This handler's only job is to reset all navigation flags to false.
+    on<ResetNavigationEvent>((event, emit) {
+      emit(state.copyWith(
+        navigateToSignup: false,
+        navigateToLogin: false,
+      ));
+    });
   }
 }

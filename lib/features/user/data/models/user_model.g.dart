@@ -18,12 +18,12 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
     };
     return UserModel(
       userId: fields[0] as String?,
-      name: fields[1] as String?,
+      name: fields[1] as String,
       email: fields[2] as String,
-      disease: fields[3] as String,
       contact: fields[4] as String,
+      disease: fields[3] as String,
       description: fields[5] as String,
-      password: fields[6] as String,
+      password: fields[6] as String?,
     );
   }
 

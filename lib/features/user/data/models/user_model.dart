@@ -6,13 +6,15 @@ import 'package:uuid/uuid.dart';
 
 part 'user_model.g.dart';
 
+//"dart run build_runner build"
+
 @HiveType(typeId:HiveTableConstant.userTableId)
 class UserModel extends Equatable{
   @HiveField(0)
   final String? userId;
 
   @HiveField(1)
-  final String? name;
+  final String name;
 
   @HiveField(2)
   final String email;
@@ -27,17 +29,17 @@ class UserModel extends Equatable{
   final String description;
 
   @HiveField(6)
-  final String password;
+  final String? password;
 
   UserModel({
-    String? userId,
+    String?userId,
     required this.name,
     required this.email,
-    required this.disease,
     required this.contact,
+    required this.disease,
     required this.description,
-    required this.password
-  }) : userId = userId ?? const Uuid().v4();
+    this.password,
+  }):userId=userId??const Uuid().v4();
 
   const UserModel.initial():
     userId="",
@@ -54,10 +56,10 @@ class UserModel extends Equatable{
     UserEntity toEntity(){
       return UserEntity(
         userId: userId ?? '',
-        name: name ?? '',
+        name: name,
         email: email,
         disease: disease,
-        password: password,
+        password: password ??'',
         contact: contact,
         description: description,
       );
@@ -65,7 +67,7 @@ class UserModel extends Equatable{
 
   
   @override
-  List<Object?> get props => [userId, name, email, disease, contact, description, password];
+  List<Object?> get props => [userId,name, email, disease, contact, description, password];
 
   
 }
