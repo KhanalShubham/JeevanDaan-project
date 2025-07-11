@@ -1,38 +1,35 @@
-import 'package:equatable/equatable.dart';
+// lib/features/user/presentation/view_model/login_view_model/login_state.dart
+part of 'login_view_model.dart';
 
-class LoginState extends Equatable {
-  final bool isLoading;
-  final bool isSuccess;
-  final bool obscureText;
-  final String? errorMessage;
-
-  const LoginState({
-    this.isLoading = false,
-    this.isSuccess = false,
-    this.obscureText = true,
-    this.errorMessage,
-  });
-
-  const LoginState.initial()
-      : isLoading = false,
-        isSuccess = false,
-        obscureText = true,
-        errorMessage = null;
-
-  LoginState copyWith({
-    bool? isLoading,
-    bool? isSuccess,
-    bool? obscureText,
-    String? errorMessage,
-  }) {
-    return LoginState(
-      isLoading: isLoading ?? this.isLoading,
-      isSuccess: isSuccess ?? this.isSuccess,
-      obscureText: obscureText ?? this.obscureText,
-      errorMessage: errorMessage ?? this.errorMessage,
-    );
-  }
+abstract class LoginState extends Equatable {
+  const LoginState();
 
   @override
-  List<Object?> get props => [isLoading, isSuccess, obscureText, errorMessage];
+  List<Object?> get props => [];
+}
+
+// Initial state, also used for password visibility changes
+class LoginInitial extends LoginState {
+  final bool obscureText;
+
+  const LoginInitial({this.obscureText = true});
+
+  @override
+  List<Object?> get props => [obscureText];
+}
+
+// State when the login process is running
+class LoginLoading extends LoginState {}
+
+// State when login is successful
+class LoginSuccess extends LoginState {}
+
+// State when login fails
+class LoginFailure extends LoginState {
+  final String error;
+
+  const LoginFailure({required this.error});
+
+  @override
+  List<Object?> get props => [error];
 }

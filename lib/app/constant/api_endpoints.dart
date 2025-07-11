@@ -30,4 +30,7 @@ class ApiEndpoints {
   // Example usage in Flutter: '${ApiEndpoints.deleteRequest}/$requestId'
   static const String deleteRequest = "${request}"; // Base for deleting by ID
 
+  static const String getMe = "auth/me";
+   static const String getDashboardRequests = "request/my-requests"; // Reusing for clarity
+
 }

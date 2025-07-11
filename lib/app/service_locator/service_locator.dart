@@ -6,6 +6,12 @@ import 'package:jeevandaan/app/shared_pref/token_shared_prefs.dart';
 import 'package:jeevandaan/core/network/api_service.dart';
 import 'package:jeevandaan/core/network/hive_services.dart';
 import 'package:jeevandaan/features/boarding/presentation/view_model/boarding_view_model.dart';
+import 'package:jeevandaan/features/dashboard/data/data_source/dashboard_remote_data_source.dart';
+import 'package:jeevandaan/features/dashboard/data/repository/dashboard_repository_impl.dart';
+import 'package:jeevandaan/features/dashboard/domain/repository/dashboard_repository.dart';
+import 'package:jeevandaan/features/dashboard/domain/usecase/get_recent_requests_usecase.dart';
+import 'package:jeevandaan/features/dashboard/domain/usecase/get_user_details_usecase.dart';
+import 'package:jeevandaan/features/dashboard/presentation/view_model/dashboard_view_model.dart';
 import 'package:jeevandaan/features/dashboard/presentation/view_model/main_navigation_view_model.dart';
 import 'package:jeevandaan/features/request/data/data_source/request_remote_data_source.dart';
 import 'package:jeevandaan/features/request/data/repository/request_repository_impl.dart';
@@ -37,6 +43,7 @@ Future<void> initDependencies() async {
   await _initRequestModule();
   await _initGeneralViewModels();
   await _initMainNavigationModule();
+  await _initDashboardModule();
 }
 
 Future<void> _initHiveServices() async{
@@ -153,6 +160,29 @@ Future<void> _initRequestModule() async {
       addRequestUseCase: serviceLocator<AddRequestUseCase>(),
       getMyRequestsUseCase: serviceLocator<GetMyRequestsUseCase>(),
       deleteRequestUseCase: serviceLocator<DeleteRequestUseCase>(),
+    ),
+  );
+}
+Future<void> _initDashboardModule() async {
+  // Data Sources
+  serviceLocator.registerLazySingleton<IDashboardRemoteDataSource>(
+    () => DashboardRemoteDataSourceImpl(apiService: serviceLocator<ApiService>()),
+  );
+
+  // Repository
+  serviceLocator.registerLazySingleton<IDashboardRepository>(
+    () => DashboardRepositoryImpl(remoteDataSource: serviceLocator<IDashboardRemoteDataSource>()),
+  );
+
+  // Use Cases
+  serviceLocator.registerFactory(() => GetUserDetailsUseCase(serviceLocator<IDashboardRepository>()));
+  serviceLocator.registerFactory(() => GetRecentRequestsUseCase(serviceLocator<IDashboardRepository>()));
+
+  // ViewModel
+  serviceLocator.registerFactory(
+    () => DashboardViewModel(
+      getUserDetailsUseCase: serviceLocator<GetUserDetailsUseCase>(),
+      getRecentRequestsUseCase: serviceLocator<GetRecentRequestsUseCase>(),
     ),
   );
 }
