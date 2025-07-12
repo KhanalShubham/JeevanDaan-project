@@ -30,4 +30,22 @@ class ApiEndpoints {
   // Example usage in Flutter: '${ApiEndpoints.deleteRequest}/$requestId'
   static const String deleteRequest = "${request}"; // Base for deleting by ID
 
+  static const String getMe = "auth/me";
+   static const String getDashboardRequests = "request/my-requests"; // Reusing for clarity
+
+  // --- Chat Endpoints ---
+  static const String chat = "chat/";
+  
+  // POST: Upload a file for a chat message
+  // The full path would be /api/chat/upload
+  static const String uploadChatFile = "${chat}upload";
+
+  // GET: Fetch message history between the current user and another user
+  // This requires the other user's ID to be appended.
+  // Example: '${ApiEndpoints.getChatHistory}/$otherUserId'
+  static const String getChatHistory = "${chat}history";
+
+  // GET: For an admin to get a list of all their conversations
+  static const String getConversations = "${chat}conversations";
+
 }

@@ -6,6 +6,19 @@ import 'package:jeevandaan/app/shared_pref/token_shared_prefs.dart';
 import 'package:jeevandaan/core/network/api_service.dart';
 import 'package:jeevandaan/core/network/hive_services.dart';
 import 'package:jeevandaan/features/boarding/presentation/view_model/boarding_view_model.dart';
+import 'package:jeevandaan/features/chat/data/data_source/chat_remote_data_source.dart';
+import 'package:jeevandaan/features/chat/data/repository/chat_repository_impl.dart';
+import 'package:jeevandaan/features/chat/domain/repository/chat_repository.dart';
+import 'package:jeevandaan/features/chat/domain/use_case/get_chat_history_use_case.dart';
+import 'package:jeevandaan/features/chat/domain/use_case/listen_for_messages_use_case.dart';
+import 'package:jeevandaan/features/chat/domain/use_case/send_chat_file_use_case.dart';
+import 'package:jeevandaan/features/chat/domain/use_case/send_text_message_use_case.dart';
+import 'package:jeevandaan/features/dashboard/data/data_source/dashboard_remote_data_source.dart';
+import 'package:jeevandaan/features/dashboard/data/repository/dashboard_repository_impl.dart';
+import 'package:jeevandaan/features/dashboard/domain/repository/dashboard_repository.dart';
+import 'package:jeevandaan/features/dashboard/domain/usecase/get_recent_requests_usecase.dart';
+import 'package:jeevandaan/features/dashboard/domain/usecase/get_user_details_usecase.dart';
+import 'package:jeevandaan/features/dashboard/presentation/view_model/dashboard_view_model.dart';
 import 'package:jeevandaan/features/dashboard/presentation/view_model/main_navigation_view_model.dart';
 import 'package:jeevandaan/features/request/data/data_source/request_remote_data_source.dart';
 import 'package:jeevandaan/features/request/data/repository/request_repository_impl.dart';
@@ -37,6 +50,8 @@ Future<void> initDependencies() async {
   await _initRequestModule();
   await _initGeneralViewModels();
   await _initMainNavigationModule();
+  await _initDashboardModule();
+  await _initChatModule();
 }
 
 Future<void> _initHiveServices() async{
@@ -155,4 +170,52 @@ Future<void> _initRequestModule() async {
       deleteRequestUseCase: serviceLocator<DeleteRequestUseCase>(),
     ),
   );
+}
+Future<void> _initDashboardModule() async {
+  // Data Sources
+  serviceLocator.registerLazySingleton<IDashboardRemoteDataSource>(
+    () => DashboardRemoteDataSourceImpl(apiService: serviceLocator<ApiService>()),
+  );
+
+  // Repository
+  serviceLocator.registerLazySingleton<IDashboardRepository>(
+    () => DashboardRepositoryImpl(remoteDataSource: serviceLocator<IDashboardRemoteDataSource>()),
+  );
+
+  // Use Cases
+  serviceLocator.registerFactory(() => GetUserDetailsUseCase(serviceLocator<IDashboardRepository>()));
+  serviceLocator.registerFactory(() => GetRecentRequestsUseCase(serviceLocator<IDashboardRepository>()));
+
+  // ViewModel
+  serviceLocator.registerFactory(
+    () => DashboardViewModel(
+      getUserDetailsUseCase: serviceLocator<GetUserDetailsUseCase>(),
+      getRecentRequestsUseCase: serviceLocator<GetRecentRequestsUseCase>(),
+    ),
+  );
+}
+Future<void> _initChatModule() async {
+  // Data Source
+  // Use registerLazySingleton because we only want ONE instance managing the socket connection.
+  serviceLocator.registerLazySingleton<IChatRemoteDataSource>(
+    () => ChatRemoteDataSourceImpl(apiService: serviceLocator<ApiService>()),
+  );
+
+  // Repository
+  // Also a singleton because it holds state/connection via the data source.
+  serviceLocator.registerLazySingleton<IChatRepository>(
+    () => ChatRepositoryImpl(remoteDataSource: serviceLocator<IChatRemoteDataSource>()),
+  );
+
+  // Use Cases
+  // Factories are fine for use cases as they are stateless.
+  serviceLocator.registerFactory(() => GetChatHistoryUseCase(serviceLocator<IChatRepository>()));
+  serviceLocator.registerFactory(() => SendTextMessageUseCase(serviceLocator<IChatRepository>()));
+  serviceLocator.registerFactory(() => SendChatFileUseCase(serviceLocator<IChatRepository>()));
+  serviceLocator.registerFactory(() => ListenForMessagesUseCase(serviceLocator<IChatRepository>()));
+
+  // ------------------------------------------------------------------
+  // ⚠️ IMPORTANT: We will NOT register the ChatBloc here.
+  // I will explain why in the next step.
+  // ------------------------------------------------------------------
 }

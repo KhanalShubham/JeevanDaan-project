@@ -11,6 +11,7 @@ void main() async {
   final box = await Hive.openBox('userBox');
   for (var user in box.values) {
     debugPrint(user.toString());
+
   }
   runApp(const App());
 }

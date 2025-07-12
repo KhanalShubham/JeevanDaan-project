@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jeevandaan/app/service_locator/service_locator.dart';
-import 'package:jeevandaan/features/boarding/presentation/view/boarding_view.dart' hide serviceLocator;
+import 'package:jeevandaan/features/boarding/presentation/view/boarding_view.dart';
 import 'package:jeevandaan/features/boarding/presentation/view_model/boarding_view_model.dart';
 
 class SplashViewModel extends Cubit<void> {
