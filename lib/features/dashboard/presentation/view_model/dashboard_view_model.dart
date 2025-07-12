@@ -1,8 +1,10 @@
 // features/dashboard/presentation/view_model/dashboard_view_model.dart
 
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jeevandaan/features/dashboard/domain/usecase/get_user_details_usecase.dart';
 import 'package:jeevandaan/features/dashboard/domain/usecase/get_recent_requests_usecase.dart';
+import 'package:jeevandaan/features/request/presentation/view/request_view.dart';
 import 'dashboard_event.dart';
 import 'dashboard_state.dart';
 
@@ -54,5 +56,11 @@ class DashboardViewModel extends Bloc<DashboardEvent, DashboardState> {
           .toList();
       emit(state.copyWith(filteredRequests: filtered));
     }
+  }
+  void _onNavigateToNewRequest(NavigateToNewRequest event, Emitter<DashboardState> emit) {
+    Navigator.push(
+      event.context,
+      MaterialPageRoute(builder: (context) => const RequestView(isAddForm: true)),
+    );
   }
 }

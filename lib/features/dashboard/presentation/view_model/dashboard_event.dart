@@ -1,6 +1,7 @@
 // features/dashboard/presentation/view_model/dashboard_event.dart
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 abstract class DashboardEvent extends Equatable {
   const DashboardEvent();
@@ -17,4 +18,8 @@ class SearchRequests extends DashboardEvent {
 
   @override
   List<Object?> get props => [query];
+}
+class NavigateToNewRequest extends DashboardEvent {
+  final BuildContext context;
+  const NavigateToNewRequest({required this.context});
 }

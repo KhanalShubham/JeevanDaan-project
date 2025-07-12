@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jeevandaan/features/chat/presentation/view/chat_view.dart';
 import 'package:jeevandaan/features/dashboard/presentation/view/dashboard_view.dart';
 import 'package:jeevandaan/features/request/presentation/view/request_view.dart';
 
@@ -17,7 +18,7 @@ class _MainNavigationViewState extends State<MainNavigationView> {
   static final List<Widget> _widgetOptions = <Widget>[
     const DashboardView(),
     const RequestView(isAddForm: false), // Default to showing the list of requests
-    _buildPlaceholder('Message'),      // Placeholder for now
+    const ChatView(),      // Placeholder for now
     _buildPlaceholder('Notifications'),// Placeholder for now
     _buildPlaceholder('Setting'),      // Placeholder for now
   ];
