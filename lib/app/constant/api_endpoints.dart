@@ -48,4 +48,13 @@ class ApiEndpoints {
   // GET: For an admin to get a list of all their conversations
   static const String getConversations = "${chat}conversations";
 
+
+   // PUT: Update the logged-in user's profile details
+  // Corresponds to: router.put('/me', authorizeToken, updateMe);
+  static const String updateMe = "auth/me";
+
+  // PUT: Change the logged-in user's password
+  // Corresponds to: router.put('/change-password', authorizeToken, changePassword);
+  static const String changePassword = "auth/changepassword";
+
 }

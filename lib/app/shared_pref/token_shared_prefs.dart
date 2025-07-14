@@ -1,17 +1,17 @@
 import 'package:dartz/dartz.dart';
-import 'package:jeevandaan/core/error/failure.dart'; 
+import 'package:jeevandaan/core/error/failure.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TokenSharedPrefs {
   final SharedPreferences _sharedPreferences;
 
   TokenSharedPrefs({required SharedPreferences sharedPreferences})
-    : _sharedPreferences = sharedPreferences;
+      : _sharedPreferences = sharedPreferences;
 
   Future<Either<Failure, void>> saveToken(String token) async {
     try {
       await _sharedPreferences.setString('token', token);
-      return Right(null);
+      return const Right(null);
     } catch (e) {
       return Left(
         SharedPreferencesFailure(message: 'Failed to save token: $e'),
@@ -27,6 +27,15 @@ class TokenSharedPrefs {
       return Left(
         SharedPreferencesFailure(message: 'Failed to retrieve token: $e'),
       );
+    }
+  }
+
+  Future<Either<Failure, void>> clearToken() async {
+    try {
+      await _sharedPreferences.remove('token');
+      return const Right(null);
+    } catch (e) {
+      return Left(SharedPreferencesFailure(message: 'Failed to clear token: $e'));
     }
   }
 }
