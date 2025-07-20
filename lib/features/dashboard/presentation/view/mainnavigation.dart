@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jeevandaan/features/chat/presentation/view/chat_view.dart';
 import 'package:jeevandaan/features/dashboard/presentation/view/dashboard_view.dart';
 import 'package:jeevandaan/features/request/presentation/view/request_view.dart';
+import 'package:jeevandaan/features/notification/presentation/views/notification_screen.dart';
 
 class MainNavigationView extends StatefulWidget {
   const MainNavigationView({super.key});
@@ -19,7 +20,7 @@ class _MainNavigationViewState extends State<MainNavigationView> {
     const DashboardView(),
     const RequestView(isAddForm: false), // Default to showing the list of requests
     const ChatView(),      // Placeholder for now
-    _buildPlaceholder('Notifications'),// Placeholder for now
+    const NotificationScreen(), // Use actual notification screen
     _buildPlaceholder('Setting'),      // Placeholder for now
   ];
 
