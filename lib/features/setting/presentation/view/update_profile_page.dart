@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jeevandaan/app/service_locator/service_locator.dart';
 import 'package:jeevandaan/features/setting/presentation/view_model/update_profile_view_model.dart';
 import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
+import 'package:provider/provider.dart';
+import 'package:jeevandaan/app/user_notifier.dart';
 
 class UpdateProfilePage extends StatelessWidget {
   const UpdateProfilePage({super.key});
@@ -67,6 +69,10 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
 
           // On success, JUST pop and send back 'true'.
           if (state.status == UpdateProfileStatus.updateSuccess) {
+            // Update the global UserNotifier with the new user info
+            if (state.user != null) {
+              Provider.of<UserNotifier>(context, listen: false).setUser(state.user!);
+            }
             Navigator.pop(context, true); // Send 'true' back to SettingsPage.
           }
 

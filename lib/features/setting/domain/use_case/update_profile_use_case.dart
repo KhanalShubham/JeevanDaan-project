@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:jeevandaan/core/error/failure.dart';
-import 'package:jeevandaan/features/setting/domain/entity/user_entity.dart';
-import 'package:jeevandaan/features/setting/domain/repository/user_repository.dart';
+import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
+import 'package:jeevandaan/features/user/domain/repository/user_repository.dart';
 
 class UpdateProfileUseCase {
   final IUserRepository repository;

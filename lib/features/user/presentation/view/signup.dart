@@ -67,7 +67,9 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: BlocConsumer<SignupViewModel, SignupState>(
           listenWhen: (prev, current) =>
@@ -78,7 +80,7 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
           listener: (context, state) {
             if (state.errorMessage != null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.errorMessage!), backgroundColor: Colors.red),
+                SnackBar(content: Text(state.errorMessage!), backgroundColor: theme.colorScheme.error),
               );
             }
             if (state.isSuccess) {
@@ -110,77 +112,86 @@ class _SignupViewState extends State<SignupView> with TickerProviderStateMixin {
             }
           },
           builder: (context, state) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      GestureDetector(
-                        onTap: () => context.read<SignupViewModel>().add(SignupPreviousStepTapped()),
-                        child: const Icon(Icons.arrow_back, color: Colors.grey),
+            return Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 64,
+                        height: 64,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Colors.green, Colors.teal],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Icon(Icons.favorite, color: Colors.white, size: 32),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('Join Hope Care', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  const Text('Start your journey of making a difference', style: TextStyle(fontSize: 16, color: Colors.grey)),
-                  const SizedBox(height: 30),
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: _buildCurrentField(context, state),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: state.isLoading
-                          ? null
-                          : () {
-                              context.read<SignupViewModel>().add(
-                                    SignupNextStepTapped(
-                                      name: _nameController.text,
-                                      email: _emailController.text,
-                                      password: _passwordController.text,
-                                      contact: _contactController.text,
-                                      disease: _diseaseController.text,
-                                      description: _descriptionController.text,
-                                    ),
-                                  );
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    Card(
+                      elevation: 8,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => context.read<SignupViewModel>().add(SignupPreviousStepTapped()),
+                                  child: Icon(Icons.arrow_back, color: theme.colorScheme.primary),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Text('Join Jeevan Daan', style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 8),
+                            Text('Start your journey of making a difference', style: theme.textTheme.bodyMedium),
+                            const SizedBox(height: 30),
+                            FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: _buildCurrentField(context, state),
+                            ),
+                            const SizedBox(height: 24),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: state.isLoading
+                                    ? null
+                                    : () {
+                                        context.read<SignupViewModel>().add(
+                                              SignupNextStepTapped(
+                                                name: _nameController.text,
+                                                email: _emailController.text,
+                                                password: _passwordController.text,
+                                                contact: _contactController.text,
+                                                disease: _diseaseController.text,
+                                                description: _descriptionController.text,
+                                              ),
+                                            );
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: theme.colorScheme.primary,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                child: state.isLoading
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+                                      )
+                                    : Text(state.currentStep < 6 ? 'Continue' : 'Create Account'),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      child: state.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
-                            )
-                          : Text(state.currentStep < 6 ? 'Continue' : 'Create Account', style: const TextStyle(fontSize: 16)),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },

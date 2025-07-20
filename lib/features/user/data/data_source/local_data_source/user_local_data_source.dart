@@ -31,4 +31,10 @@ class UserLocalDataSource implements IUserDataSource{
       throw Exception("Registration failed: $e");
     }
   }
+
+  @override
+  Future<UserEntity> getMe(String token) async {
+    // Implement your local user fetch logic here if needed
+    throw UnimplementedError('Local getMe not implemented');
+  }
 }

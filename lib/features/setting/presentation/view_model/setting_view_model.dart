@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dartz/dartz.dart';
-import 'package:jeevandaan/features/setting/domain/entity/user_entity.dart';
+   import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
 import 'package:jeevandaan/features/setting/domain/use_case/get_profile_use_case.dart';
 import 'package:jeevandaan/features/setting/domain/use_case/update_profile_use_case.dart';
 import 'package:jeevandaan/features/setting/domain/use_case/change_password_use_case.dart';
@@ -58,7 +58,7 @@ class SettingViewModel extends ChangeNotifier {
     error = null;
     successMessage = null;
     notifyListeners();
-    final Either<Failure, void> result = await changePasswordUseCase(token, currentPassword: currentPassword, newPassword: newPassword);
+    final Either<Failure, void> result = await changePasswordUseCase(ChangePasswordParams(currentPassword: currentPassword, newPassword: newPassword));
     result.fold((l) {
       error = l.message;
     }, (r) {

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:jeevandaan/app/shared_pref/token_shared_prefs.dart';
 import 'package:jeevandaan/core/error/exceptions.dart';
 import 'package:jeevandaan/core/network/api_service.dart';
 import 'package:jeevandaan/features/chat/data/model/message_model.dart';
@@ -22,7 +23,7 @@ class ChatRemoteDataSourceImpl implements IChatRemoteDataSource {
   IO.Socket? _socket;
   final StreamController<MessageModel> _messageStreamController = StreamController.broadcast();
   
-  ChatRemoteDataSourceImpl({required this.apiService});
+  ChatRemoteDataSourceImpl({required this.apiService, required TokenSharedPrefs tokenSharedPrefs});
   
   @override
   void connectSocket(String token) {

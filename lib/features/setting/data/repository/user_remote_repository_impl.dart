@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:jeevandaan/core/error/failure.dart';
-import 'package:jeevandaan/features/user/data/data_source/remote_data_source/user_remote_datasource.dart';
+import 'package:jeevandaan/features/setting/data/data_source/user_remote_datasource.dart';
 import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
 import 'package:jeevandaan/features/user/domain/repository/user_repository.dart';
 

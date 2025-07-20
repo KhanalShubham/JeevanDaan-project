@@ -10,4 +10,13 @@ abstract interface class IUserRepository {
     String email,
     String password,
   );
+  Future<Either<Failure, UserEntity>> getMe(String token);
+  Future<Either<Failure, UserEntity>> updateMe(
+    String token, {
+      required String name,
+      required String description,
+      required String contact,
+      required String disease,
+    }
+  );
 }

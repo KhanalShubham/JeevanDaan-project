@@ -37,4 +37,37 @@ Future<Either<Failure, void>> registerUser(UserEntity user) async {
     return Left(RemoteDatabaseFailure(message: errorMessage));
   }
 }
+
+  @override
+  Future<Either<Failure, UserEntity>> getMe(String token) async {
+    try {
+      final user = await _userRemoteDatasource.getMe(token);
+      return Right(user);
+    } catch (e) {
+      return Left(RemoteDatabaseFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> updateMe(
+    String token, {
+      required String name,
+      required String description,
+      required String contact,
+      required String disease,
+    }
+  ) async {
+    try {
+      final user = await _userRemoteDatasource.updateMe(
+        token,
+        name: name,
+        description: description,
+        contact: contact,
+        disease: disease,
+      );
+      return Right(user);
+    } catch (e) {
+      return Left(RemoteDatabaseFailure(message: e.toString()));
+    }
+  }
 }

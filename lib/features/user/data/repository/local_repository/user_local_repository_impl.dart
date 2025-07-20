@@ -31,5 +31,27 @@ class UserLocalRepositoryImpl implements IUserRepository{
     }
   }
   
+  @override
+  Future<Either<Failure, UserEntity>> getMe(String token) async {
+    try {
+      // For local, you may not use the token, just fetch the user from local storage
+      // This is a placeholder; adjust as needed for your local logic
+      throw UnimplementedError('Local getMe not implemented');
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: "Failed to fetch user profile: $e"));
+    }
+  }
 
+  @override
+  Future<Either<Failure, UserEntity>> updateMe(
+    String token, {
+      required String name,
+      required String description,
+      required String contact,
+      required String disease,
+    }
+  ) async {
+    // Implement your local update logic or return an error for now
+    return Left(LocalDatabaseFailure(message: "Local updateMe not implemented"));
+  }
 }

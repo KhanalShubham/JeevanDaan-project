@@ -55,4 +55,49 @@ class UserRemoteDatasource implements IUserDataSource {
       throw Exception("An unexpected error occurred: $e");
     }
   }
+
+  @override
+  Future<UserEntity> getMe(String token) async {
+    try {
+      final response = await _apiService.dio.get(
+        ApiEndpoints.getMe,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      if (response.statusCode == 200 && response.data['data'] != null) {
+        return UserApiModel.fromJson(response.data['data']).toEntity();
+      } else {
+        throw Exception(response.statusMessage);
+      }
+    } on DioException catch (e) {
+      throw Exception("Failed to fetch user profile: "+ (e.response?.data['message'] ?? e.message));
+    } catch (e) {
+      throw Exception("Failed to fetch user profile: $e");
+    }
+  }
+
+  @override
+  Future<UserEntity> updateMe(
+    String token, {
+      required String name,
+      required String description,
+      required String contact,
+      required String disease,
+    }
+  ) async {
+    final response = await _apiService.dio.put(
+      ApiEndpoints.updateProfile,
+      data: {
+        'name': name,
+        'description': description,
+        'contact': contact,
+        'disease': disease,
+      },
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+    if (response.statusCode == 200 && response.data['data'] != null) {
+      return UserApiModel.fromJson(response.data['data']).toEntity();
+    } else {
+      throw Exception(response.statusMessage);
+    }
+  }
 }

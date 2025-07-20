@@ -8,6 +8,9 @@ import 'package:jeevandaan/features/request/domain/entity/request_entity.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:provider/provider.dart';
+import 'package:jeevandaan/app/user_notifier.dart';
+import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
 
 import '../view_model/dashboard_event.dart';
 import '../view_model/dashboard_state.dart';
@@ -47,39 +50,77 @@ class _DashboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.background,
-      body: BlocBuilder<DashboardViewModel, DashboardState>(
-        builder: (context, state) {
-          if (state.isLoading && state.user == null) {
-            return _buildLoadingSkeleton(); // Professional loading state
-          }
-          if (state.errorMessage != null) {
-            return Center(
-              child: Text(
-                'Error: ${state.errorMessage}',
-                style: GoogleFonts.inter(color: AppTheme.secondaryText),
-              ),
-            );
-          }
-          // The main, loaded UI
-          return RefreshIndicator(
-            onRefresh: () async {
-              context.read<DashboardViewModel>().add(FetchDashboardData());
-            },
-            color: AppTheme.primaryRed,
-            child: CustomScrollView(
-              slivers: [
-                _buildHeader(context, state),
-                SliverList(
-                  delegate: SliverChildListDelegate(
-                    [
-                      _buildCampaignCarousel(context).animate().fadeIn(delay: 200.ms, duration: 400.ms).slideY(begin: 0.1),
-                      _buildQuickActions(context).animate().fadeIn(delay: 300.ms, duration: 400.ms).slideY(begin: 0.1),
-                      _buildRequestsSection(context, state).animate().fadeIn(delay: 400.ms, duration: 400.ms),
-                    ],
+      body: Consumer<UserNotifier>(
+        builder: (context, userNotifier, _) {
+          return BlocBuilder<DashboardViewModel, DashboardState>(
+            builder: (context, state) {
+              final user = userNotifier.user ?? state.user;
+              if (state.isLoading && user == null) {
+                return _buildLoadingSkeleton();
+              }
+              if (state.errorMessage != null) {
+                return Center(
+                  child: Text(
+                    'Error:  {state.errorMessage}',
+                    style: GoogleFonts.inter(color: AppTheme.secondaryText),
                   ),
+                );
+              }
+              return RefreshIndicator(
+                onRefresh: () async {
+                  context.read<DashboardViewModel>().add(FetchDashboardData());
+                },
+                color: AppTheme.primaryRed,
+                child: CustomScrollView(
+                  slivers: [
+                    _buildHeader(context, user),
+                    SliverList(
+                      delegate: SliverChildListDelegate(
+                        [
+                          const SizedBox(height: 16),
+                          // Campaign carousel in a card
+                          Card(
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            elevation: 6,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: _buildCampaignCarousel(context)
+                                  .animate().fadeIn(delay: 200.ms, duration: 400.ms).slideY(begin: 0.1),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          // Quick actions in a card
+                          Card(
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            elevation: 6,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 20.0),
+                              child: _buildQuickActions(context)
+                                  .animate().fadeIn(delay: 300.ms, duration: 400.ms).slideY(begin: 0.1),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          // Requests section in a card
+                          Card(
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            elevation: 6,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: _buildRequestsSection(context, state)
+                                  .animate().fadeIn(delay: 400.ms, duration: 400.ms),
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           );
         },
       ),
@@ -126,7 +167,7 @@ class _DashboardPage extends StatelessWidget {
     );
   }
 
-  SliverAppBar _buildHeader(BuildContext context, DashboardState state) {
+  SliverAppBar _buildHeader(BuildContext context, UserEntity? user) {
     return SliverAppBar(
       backgroundColor: AppTheme.background,
       pinned: true,
@@ -139,7 +180,7 @@ class _DashboardPage extends StatelessWidget {
             radius: 24,
             backgroundColor: AppTheme.primaryRedLight,
             child: Text(
-              state.user?.name.isNotEmpty == true ? state.user!.name[0].toUpperCase() : 'U',
+              user?.name.isNotEmpty == true ? user!.name[0].toUpperCase() : 'U',
               style: GoogleFonts.inter(color: AppTheme.primaryRed, fontWeight: FontWeight.bold, fontSize: 22),
             ),
           ),
@@ -152,7 +193,7 @@ class _DashboardPage extends StatelessWidget {
                 style: GoogleFonts.inter(color: AppTheme.secondaryText, fontSize: 14),
               ),
               Text(
-                state.user?.name.split(' ').first ?? 'User',
+                user?.name.split(' ').first ?? 'User',
                 style: GoogleFonts.inter(color: AppTheme.darkText, fontWeight: FontWeight.w600, fontSize: 20),
               ),
             ],

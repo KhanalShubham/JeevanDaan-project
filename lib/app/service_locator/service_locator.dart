@@ -1,5 +1,3 @@
-// lib/core/di/service_locator.dart
-
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:jeevandaan/app/constant/api_endpoints.dart';
@@ -28,7 +26,16 @@ import 'package:jeevandaan/features/request/domain/repository/request_repository
 import 'package:jeevandaan/features/request/domain/usecase/add_request_usecase.dart';
 import 'package:jeevandaan/features/request/domain/usecase/delete_request_usecase.dart';
 import 'package:jeevandaan/features/request/domain/usecase/get_my_requests_usecase.dart';
-import 'package:jeevandaan/features/request/presentation/view_model/request_view_model.dart'; // Corrected path
+import 'package:jeevandaan/features/request/presentation/view_model/request_view_model.dart';
+import 'package:jeevandaan/features/setting/data/data_source/settings_remote_data_source.dart';
+import 'package:jeevandaan/features/setting/data/repository/settings_repository_impl.dart';
+import 'package:jeevandaan/features/setting/domain/repository/settings_repository.dart';
+import 'package:jeevandaan/features/setting/domain/use_case/change_password_use_case.dart';
+import 'package:jeevandaan/features/setting/domain/use_case/logout_use_case.dart';
+import 'package:jeevandaan/features/setting/domain/use_case/update_user_details_use_case.dart';
+import 'package:jeevandaan/features/setting/presentation/view_model/change_password_view_model.dart';
+import 'package:jeevandaan/features/setting/presentation/view_model/settings_view_model.dart';
+import 'package:jeevandaan/features/setting/presentation/view_model/update_profile_view_model.dart';
 import 'package:jeevandaan/features/splash/presentation/view_model/splash_view_model.dart';
 import 'package:jeevandaan/features/user/data/data_source/local_data_source/user_local_data_source.dart';
 import 'package:jeevandaan/features/user/data/data_source/remote_data_source/user_remote_datasource.dart';
@@ -40,83 +47,68 @@ import 'package:jeevandaan/features/user/domain/use_case/user_register_use_case.
 import 'package:jeevandaan/features/user/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:jeevandaan/features/user/presentation/view_model/register_view_model/signup_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jeevandaan/features/notification/presentation/view_model/notification_view_model.dart';
 import 'package:jeevandaan/features/notification/data/data_source/notification_remote_data_source.dart';
 import 'package:jeevandaan/features/notification/data/repository/notification_repository_impl.dart';
 import 'package:jeevandaan/features/notification/domain/repository/notification_repository.dart';
 import 'package:jeevandaan/features/notification/domain/usecase/get_notifications_usecase.dart';
 import 'package:jeevandaan/features/notification/domain/usecase/mark_notification_as_read_usecase.dart';
 import 'package:jeevandaan/features/notification/domain/usecase/mark_all_notifications_as_read_usecase.dart';
-import 'package:jeevandaan/features/notification/presentation/view_model/notification_view_model.dart';
-import 'package:jeevandaan/core/services/notification_service.dart';
+import 'package:jeevandaan/features/setting/presentation/view_model/setting_view_model.dart';
+import 'package:jeevandaan/features/setting/domain/use_case/get_profile_use_case.dart';
+import 'package:jeevandaan/features/setting/domain/use_case/update_profile_use_case.dart';
 
 final serviceLocator = GetIt.instance;
 
 Future<void> initDependencies() async {
   await _initHiveServices();
-  await _initSharedPref();    // Initialize Shared Preferences (including TokenSharedPrefs) FIRST
-  await _initApiServices();   // ApiService depends on TokenSharedPrefs, so it comes after
+  await _initSharedPref();
+  await _initApiServices();
   await _initUserModule();
   await _initRequestModule();
   await _initGeneralViewModels();
   await _initDashboardModule();
   await _initChatModule();
+  await _initSettingsModule();
   await _initNotificationModule();
-  await _initNotificationService();
 }
 
-Future<void> _initHiveServices() async{
-  serviceLocator.registerLazySingleton(()=>HiveServices());
+Future<void> _initHiveServices() async {
+  serviceLocator.registerLazySingleton(() => HiveServices());
 }
 
-Future<void> _initApiServices() async{
-  // FIX: Register Dio as a singleton *before* ApiService
-  serviceLocator.registerLazySingleton(() => Dio()); // Register Dio instance first
-
-  serviceLocator.registerLazySingleton(()=>ApiService(
-    serviceLocator<Dio>(), // Now Dio can be successfully retrieved
-    tokenSharedPrefs: serviceLocator<TokenSharedPrefs>(),
-  ));
-  // REMOVE THIS DUPLICATE BLOCK:
-  // serviceLocator.registerLazySingleton(() => ApiService(
-  //   serviceLocator<Dio>(),
-  //   tokenSharedPrefs: serviceLocator<TokenSharedPrefs>(), // Pass TokenSharedPrefs here
-  // ));
-  // serviceLocator.registerLazySingleton(() => Dio()); // Ensure Dio is registered
+Future<void> _initApiServices() async {
+  serviceLocator.registerLazySingleton(() => Dio());
+  serviceLocator.registerLazySingleton(() => ApiService(
+        serviceLocator<Dio>(),
+        tokenSharedPrefs: serviceLocator<TokenSharedPrefs>(),
+      ));
 }
 
-Future<void> _initSharedPref() async{
+Future<void> _initSharedPref() async {
   final sharedPref = await SharedPreferences.getInstance();
-  serviceLocator.registerLazySingleton(()=>sharedPref);
+  serviceLocator.registerLazySingleton(() => sharedPref);
   serviceLocator.registerLazySingleton(
-    ()=>TokenSharedPrefs(sharedPreferences: serviceLocator<SharedPreferences>(),)
+    () => TokenSharedPrefs(
+      sharedPreferences: serviceLocator<SharedPreferences>(),
+    ),
   );
 }
 
 Future<void> _initUserModule() async {
-  // Data Sources
   serviceLocator.registerFactory(
     () => UserRemoteDatasource(apiService: serviceLocator<ApiService>()),
   );
   serviceLocator.registerFactory(
     () => UserLocalDataSource(hiveservices: serviceLocator<HiveServices>()),
   );
-
-  // Repository
   serviceLocator.registerFactory(
-    ()=>UserLocalRepositoryImpl(userLocalDataSource: serviceLocator<UserLocalDataSource>(),)
-  );
-
-  // Register the implementation (UserRemoteRepositoryImpl)
-  // but as its abstract type (IUserRepository).
+      () => UserLocalRepositoryImpl(userLocalDataSource: serviceLocator<UserLocalDataSource>()));
   serviceLocator.registerFactory<IUserRepository>(
     () => UserRemoteRepositoryImpl(
       userRemoteDatasource: serviceLocator<UserRemoteDatasource>(),
     ),
   );
-
-  // Usecases
-  // The UseCases can correctly ask for an `IUserRepository`
-  // and GetIt will provide the `UserRemoteRepositoryImpl` we registered above.
   serviceLocator.registerFactory(
     () => UserLoginUseCase(
       userRepository: serviceLocator<IUserRepository>(),
@@ -128,14 +120,12 @@ Future<void> _initUserModule() async {
       userRepository: serviceLocator<IUserRepository>(),
     ),
   );
-
-  // --- User-specific ViewModels ---
   serviceLocator.registerFactory(
-    () => LoginViewModel(
-      serviceLocator<UserLoginUseCase>()
-    ),
+    () => UpdateProfileUseCase(serviceLocator<IUserRepository>()),
   );
-
+  serviceLocator.registerFactory(
+    () => LoginViewModel(serviceLocator<UserLoginUseCase>()),
+  );
   serviceLocator.registerFactory(
     () => SignupViewModel(
       serviceLocator<UserRegisterUseCase>(),
@@ -144,29 +134,20 @@ Future<void> _initUserModule() async {
 }
 
 Future<void> _initGeneralViewModels() async {
-  // Splash and Boarding ViewModels
   serviceLocator.registerFactory<SplashViewModel>(() => SplashViewModel());
   serviceLocator.registerFactory<BoardingViewModel>(() => BoardingViewModel());
 }
 
-// Request Module Initialization
 Future<void> _initRequestModule() async {
-  // Data Sources
   serviceLocator.registerLazySingleton<IRequestRemoteDataSource>(
     () => RequestRemoteDataSourceImpl(apiService: serviceLocator<ApiService>()),
   );
-
-  // Repository
   serviceLocator.registerLazySingleton<IRequestRepository>(
     () => RequestRepositoryImpl(remoteDataSource: serviceLocator<IRequestRemoteDataSource>()),
   );
-
-  // Use Cases
   serviceLocator.registerFactory(() => AddRequestUseCase(serviceLocator<IRequestRepository>()));
   serviceLocator.registerFactory(() => GetMyRequestsUseCase(serviceLocator<IRequestRepository>()));
   serviceLocator.registerFactory(() => DeleteRequestUseCase(serviceLocator<IRequestRepository>()));
-
-  // ViewModel (Bloc)
   serviceLocator.registerFactory(
     () => RequestViewModel(
       addRequestUseCase: serviceLocator<AddRequestUseCase>(),
@@ -177,21 +158,15 @@ Future<void> _initRequestModule() async {
 }
 
 Future<void> _initDashboardModule() async {
-  // Data Sources
   serviceLocator.registerLazySingleton<IDashboardRemoteDataSource>(
     () => DashboardRemoteDataSourceImpl(apiService: serviceLocator<ApiService>()),
   );
-
-  // Repository
   serviceLocator.registerLazySingleton<IDashboardRepository>(
     () => DashboardRepositoryImpl(remoteDataSource: serviceLocator<IDashboardRemoteDataSource>()),
   );
-
-  // Use Cases
   serviceLocator.registerFactory(() => GetUserDetailsUseCase(serviceLocator<IDashboardRepository>()));
-  serviceLocator.registerFactory(() => GetRecentRequestsUseCase(serviceLocator<IDashboardRepository>()));
-
-  // ViewModel
+  serviceLocator
+      .registerFactory(() => GetRecentRequestsUseCase(serviceLocator<IDashboardRepository>()));
   serviceLocator.registerFactory(
     () => DashboardViewModel(
       getUserDetailsUseCase: serviceLocator<GetUserDetailsUseCase>(),
@@ -201,52 +176,73 @@ Future<void> _initDashboardModule() async {
 }
 
 Future<void> _initChatModule() async {
-  // Data Source
-  // Use registerLazySingleton because we only want ONE instance managing the socket connection.
   serviceLocator.registerLazySingleton<IChatRemoteDataSource>(
-    () => ChatRemoteDataSourceImpl(apiService: serviceLocator<ApiService>()),
+    () => ChatRemoteDataSourceImpl(
+      apiService: serviceLocator<ApiService>(),
+      tokenSharedPrefs: serviceLocator<TokenSharedPrefs>(),
+    ),
   );
-
-  // Repository
-  // Also a singleton because it holds state/connection via the data source.
   serviceLocator.registerLazySingleton<IChatRepository>(
     () => ChatRepositoryImpl(remoteDataSource: serviceLocator<IChatRemoteDataSource>()),
   );
-
-  // Use Cases
-  // Factories are fine for use cases as they are stateless.
   serviceLocator.registerFactory(() => GetChatHistoryUseCase(serviceLocator<IChatRepository>()));
   serviceLocator.registerFactory(() => SendTextMessageUseCase(serviceLocator<IChatRepository>()));
   serviceLocator.registerFactory(() => SendChatFileUseCase(serviceLocator<IChatRepository>()));
   serviceLocator.registerFactory(() => ListenForMessagesUseCase(serviceLocator<IChatRepository>()));
-
-  // ------------------------------------------------------------------
-  // ⚠️ IMPORTANT: We will NOT register the ChatBloc here.
-  // I will explain why in the next step.
-  // ------------------------------------------------------------------
 }
 
 Future<void> _initNotificationModule() async {
-  serviceLocator.registerLazySingleton<INotificationRemoteDataSource>(() =>
-      NotificationRemoteDataSourceImpl(apiService: serviceLocator<ApiService>()));
-  serviceLocator.registerLazySingleton<INotificationRepository>(() =>
-      NotificationRepositoryImpl(
-          remoteDataSource: serviceLocator<INotificationRemoteDataSource>()));
-  serviceLocator.registerFactory(
-      () => GetNotificationsUseCase(serviceLocator<INotificationRepository>()));
-  serviceLocator.registerFactory(
-      () => MarkNotificationAsReadUseCase(serviceLocator<INotificationRepository>()));
-  serviceLocator.registerFactory(
-      () => MarkAllNotificationsAsReadUseCase(serviceLocator<INotificationRepository>()));
-  serviceLocator.registerFactory(
-      () => NotificationViewModel(
-        serviceLocator<GetNotificationsUseCase>(),
-        serviceLocator<MarkNotificationAsReadUseCase>(),
-        serviceLocator<MarkAllNotificationsAsReadUseCase>(),
-      ));
+  serviceLocator.registerLazySingleton<INotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(apiService: serviceLocator<ApiService>()),
+  );
+  serviceLocator.registerLazySingleton<INotificationRepository>(
+    () => NotificationRepositoryImpl(remoteDataSource: serviceLocator<INotificationRemoteDataSource>()),
+  );
+  serviceLocator.registerFactory(() => GetNotificationsUseCase(serviceLocator<INotificationRepository>()));
+  serviceLocator.registerFactory(() => MarkNotificationAsReadUseCase(serviceLocator<INotificationRepository>()));
+  serviceLocator.registerFactory(() => MarkAllNotificationsAsReadUseCase(serviceLocator<INotificationRepository>()));
+  serviceLocator.registerFactory(() => NotificationViewModel(
+    serviceLocator<GetNotificationsUseCase>(),
+    serviceLocator<MarkNotificationAsReadUseCase>(),
+    serviceLocator<MarkAllNotificationsAsReadUseCase>(),
+  ));
 }
 
-Future<void> _initNotificationService() async {
-  serviceLocator.registerLazySingleton(() => NotificationService());
-  await serviceLocator<NotificationService>().init();
+Future<void> _initSettingsModule() async {
+  serviceLocator.registerLazySingleton<ISettingsRemoteDataSource>(
+    () => SettingsRemoteDataSourceImpl(apiService: serviceLocator<ApiService>()),
+  );
+  serviceLocator.registerLazySingleton<ISettingsRepository>(
+    () => SettingsRepositoryImpl(remoteDataSource: serviceLocator<ISettingsRemoteDataSource>()),
+  );
+  serviceLocator
+      .registerFactory(() => UpdateUserDetailsUseCase(serviceLocator<ISettingsRepository>()));
+  serviceLocator.registerFactory(() => ChangePasswordUseCase(serviceLocator<ISettingsRepository>()));
+  serviceLocator.registerFactory(
+      () => LogoutUseCase(tokenSharedPrefs: serviceLocator<TokenSharedPrefs>()));
+  serviceLocator.registerFactory(() => GetProfileUseCase(serviceLocator<IUserRepository>()));
+  serviceLocator.registerFactory(
+    () => SettingsViewModel(
+      logoutUseCase: serviceLocator<LogoutUseCase>(),
+      getUserDetailsUseCase: serviceLocator<GetUserDetailsUseCase>(),
+    ),
+  );
+  serviceLocator.registerFactory(
+    () => UpdateProfileViewModel(
+      updateUserDetailsUseCase: serviceLocator<UpdateUserDetailsUseCase>(),
+      getUserDetailsUseCase: serviceLocator<GetUserDetailsUseCase>(),
+    ),
+  );
+  serviceLocator.registerFactory(
+    () => ChangePasswordViewModel(
+      changePasswordUseCase: serviceLocator<ChangePasswordUseCase>(),
+    ),
+  );
+  serviceLocator.registerFactory(
+    () => SettingViewModel(
+      getProfileUseCase: serviceLocator<GetProfileUseCase>(),
+      updateProfileUseCase: serviceLocator<UpdateProfileUseCase>(),
+      changePasswordUseCase: serviceLocator<ChangePasswordUseCase>(),
+    ),
+  );
 }

@@ -67,8 +67,12 @@ dependencies:
   flutter_webrtc: ^0.14.2
   record: ^6.0.0
   url_launcher: ^6.3.2
+  mocktail: ^1.0.4
+  bloc_test: ^10.0.0
   flutter_local_notifications: ^18.0.1
-  provider: ^6.1.2
+  google_sign_in: ^6.1.5
+  flutter_facebook_auth: ^6.0.4
+  flutter_svg: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -95,6 +99,12 @@ flutter:
   assets:
     - assets/images/
     - assets/lottie/
+    - assets/images/card.svg
+    - assets/images/help.svg
+    - assets/images/privacy.svg
+    - assets/images/terms.svg
+    - assets/images/feedback.svg
+    - assets/images/faq.svg
   
 
   # An image asset can refer to one or more resolution-specific "variants", see
