@@ -23,6 +23,17 @@ class NotificationScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.primary),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.mark_email_read, color: theme.colorScheme.primary),
+              tooltip: 'Mark all as read',
+              onPressed: () {
+                context.read<NotificationViewModel>().add(MarkAllNotificationsAsRead());
+              },
+            ),
+          ),
+        ],
       ),
       body: BlocBuilder<NotificationViewModel, NotificationState>(
         builder: (context, state) {
@@ -92,6 +103,9 @@ class NotificationScreen extends StatelessWidget {
                     ),
                     onTap: () {
                       // Mark as read and handle tap
+                      if (!notification.isRead) {
+                        context.read<NotificationViewModel>().add(MarkNotificationAsRead(notification.id));
+                      }
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Notification tapped: ${notification.title}'),

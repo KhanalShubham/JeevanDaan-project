@@ -2,8 +2,11 @@
 
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:jeevandaan/app/constant/api_endpoints.dart';
+import 'package:jeevandaan/app/shared_pref/auth_prefs.dart';
 import 'package:jeevandaan/app/shared_pref/token_shared_prefs.dart';
 import 'package:jeevandaan/core/network/api_service.dart';
+import 'package:jeevandaan/core/network/dio_error_interceptor.dart';
 import 'package:jeevandaan/core/network/hive_services.dart';
 import 'package:jeevandaan/features/boarding/presentation/view_model/boarding_view_model.dart';
 import 'package:jeevandaan/features/chat/data/data_source/chat_remote_data_source.dart';
@@ -19,7 +22,6 @@ import 'package:jeevandaan/features/dashboard/domain/repository/dashboard_reposi
 import 'package:jeevandaan/features/dashboard/domain/usecase/get_recent_requests_usecase.dart';
 import 'package:jeevandaan/features/dashboard/domain/usecase/get_user_details_usecase.dart';
 import 'package:jeevandaan/features/dashboard/presentation/view_model/dashboard_view_model.dart';
-import 'package:jeevandaan/features/dashboard/presentation/view_model/main_navigation_view_model.dart';
 import 'package:jeevandaan/features/request/data/data_source/request_remote_data_source.dart';
 import 'package:jeevandaan/features/request/data/repository/request_repository_impl.dart';
 import 'package:jeevandaan/features/request/domain/repository/request_repository.dart';
@@ -38,7 +40,14 @@ import 'package:jeevandaan/features/user/domain/use_case/user_register_use_case.
 import 'package:jeevandaan/features/user/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:jeevandaan/features/user/presentation/view_model/register_view_model/signup_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:jeevandaan/features/notification/data/data_source/notification_remote_data_source.dart';
+import 'package:jeevandaan/features/notification/data/repository/notification_repository_impl.dart';
+import 'package:jeevandaan/features/notification/domain/repository/notification_repository.dart';
+import 'package:jeevandaan/features/notification/domain/usecase/get_notifications_usecase.dart';
+import 'package:jeevandaan/features/notification/domain/usecase/mark_notification_as_read_usecase.dart';
+import 'package:jeevandaan/features/notification/domain/usecase/mark_all_notifications_as_read_usecase.dart';
+import 'package:jeevandaan/features/notification/presentation/view_model/notification_view_model.dart';
+import 'package:jeevandaan/core/services/notification_service.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -49,9 +58,10 @@ Future<void> initDependencies() async {
   await _initUserModule();
   await _initRequestModule();
   await _initGeneralViewModels();
-  await _initMainNavigationModule();
   await _initDashboardModule();
   await _initChatModule();
+  await _initNotificationModule();
+  await _initNotificationService();
 }
 
 Future<void> _initHiveServices() async{
@@ -79,12 +89,6 @@ Future<void> _initSharedPref() async{
   serviceLocator.registerLazySingleton(()=>sharedPref);
   serviceLocator.registerLazySingleton(
     ()=>TokenSharedPrefs(sharedPreferences: serviceLocator<SharedPreferences>(),)
-  );
-}
-
-Future<void> _initMainNavigationModule() async {
-  serviceLocator.registerFactory(
-    () => MainNavigationViewModel(loginViewModel: serviceLocator<LoginViewModel>()),
   );
 }
 
@@ -171,6 +175,7 @@ Future<void> _initRequestModule() async {
     ),
   );
 }
+
 Future<void> _initDashboardModule() async {
   // Data Sources
   serviceLocator.registerLazySingleton<IDashboardRemoteDataSource>(
@@ -194,6 +199,7 @@ Future<void> _initDashboardModule() async {
     ),
   );
 }
+
 Future<void> _initChatModule() async {
   // Data Source
   // Use registerLazySingleton because we only want ONE instance managing the socket connection.
@@ -218,4 +224,29 @@ Future<void> _initChatModule() async {
   // ⚠️ IMPORTANT: We will NOT register the ChatBloc here.
   // I will explain why in the next step.
   // ------------------------------------------------------------------
+}
+
+Future<void> _initNotificationModule() async {
+  serviceLocator.registerLazySingleton<INotificationRemoteDataSource>(() =>
+      NotificationRemoteDataSourceImpl(apiService: serviceLocator<ApiService>()));
+  serviceLocator.registerLazySingleton<INotificationRepository>(() =>
+      NotificationRepositoryImpl(
+          remoteDataSource: serviceLocator<INotificationRemoteDataSource>()));
+  serviceLocator.registerFactory(
+      () => GetNotificationsUseCase(serviceLocator<INotificationRepository>()));
+  serviceLocator.registerFactory(
+      () => MarkNotificationAsReadUseCase(serviceLocator<INotificationRepository>()));
+  serviceLocator.registerFactory(
+      () => MarkAllNotificationsAsReadUseCase(serviceLocator<INotificationRepository>()));
+  serviceLocator.registerFactory(
+      () => NotificationViewModel(
+        serviceLocator<GetNotificationsUseCase>(),
+        serviceLocator<MarkNotificationAsReadUseCase>(),
+        serviceLocator<MarkAllNotificationsAsReadUseCase>(),
+      ));
+}
+
+Future<void> _initNotificationService() async {
+  serviceLocator.registerLazySingleton(() => NotificationService());
+  await serviceLocator<NotificationService>().init();
 }

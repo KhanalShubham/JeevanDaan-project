@@ -7,4 +7,13 @@ abstract class NotificationEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetNotifications extends NotificationEvent {} 
+class GetNotifications extends NotificationEvent {}
+
+class MarkNotificationAsRead extends NotificationEvent {
+  final String notificationId;
+  const MarkNotificationAsRead(this.notificationId);
+  @override
+  List<Object> get props => [notificationId];
+}
+
+class MarkAllNotificationsAsRead extends NotificationEvent {} 

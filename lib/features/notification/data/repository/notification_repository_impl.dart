@@ -13,4 +13,14 @@ class NotificationRepositoryImpl implements INotificationRepository {
   Future<List<NotificationEntity>> getNotifications() async {
     return await _remoteDataSource.getNotifications();
   }
+
+  @override
+  Future<void> markNotificationAsRead(String notificationId) async {
+    await _remoteDataSource.markNotificationAsRead(notificationId);
+  }
+
+  @override
+  Future<void> markAllNotificationsAsRead() async {
+    await _remoteDataSource.markAllNotificationsAsRead();
+  }
 } 

@@ -2,4 +2,6 @@ import 'package:jeevandaan/features/notification/domain/entities/notification_en
 
 abstract class INotificationRepository {
   Future<List<NotificationEntity>> getNotifications();
+  Future<void> markNotificationAsRead(String notificationId);
+  Future<void> markAllNotificationsAsRead();
 } 
