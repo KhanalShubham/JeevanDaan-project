@@ -3,24 +3,39 @@ import 'package:jeevandaan/core/error/failure.dart';
 import 'package:jeevandaan/features/user/data/data_source/remote_data_source/user_remote_datasource.dart';
 import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
 import 'package:jeevandaan/features/user/domain/repository/user_repository.dart';
+import 'package:jeevandaan/core/network/api_service.dart';
+import 'package:flutter/foundation.dart';
+import 'package:jeevandaan/features/user/data/repository/local_repository/user_local_repository_impl.dart';
 
 class UserRemoteRepositoryImpl implements IUserRepository {
   final UserRemoteDatasource _userRemoteDatasource;
+  final UserLocalRepositoryImpl? _userLocalRepository;
+  final ConnectivityService _connectivityService = ConnectivityService();
 
   UserRemoteRepositoryImpl({
     required UserRemoteDatasource userRemoteDatasource,
-  }) : _userRemoteDatasource = userRemoteDatasource;
+    UserLocalRepositoryImpl? userLocalRepository,
+  })  : _userRemoteDatasource = userRemoteDatasource,
+        _userLocalRepository = userLocalRepository;
 
   @override
   Future<Either<Failure, String>> login(
     String email,
     String password,
   ) async {
-    try {
-      final token = await _userRemoteDatasource.login(email, password);
-      return Right(token);
-    } catch (e) {
-      return Left(RemoteDatabaseFailure(message: e.toString()));
+    final online = await _connectivityService.isOnline;
+    if (online) {
+      try {
+        final token = await _userRemoteDatasource.login(email, password);
+        return Right(token);
+      } catch (e) {
+        return Left(RemoteDatabaseFailure(message: e.toString()));
+      }
+    } else if (_userLocalRepository != null) {
+      debugPrint('[OFFLINE] Using local data source for login');
+      return _userLocalRepository!.login(email, password);
+    } else {
+      return Left(RemoteDatabaseFailure(message: 'No internet and no local data source available.'));
     }
   }
 

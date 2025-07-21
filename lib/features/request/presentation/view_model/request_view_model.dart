@@ -118,8 +118,15 @@ class RequestViewModel extends Bloc<RequestEvent, RequestState> {
   // Navigation events
   void _onNavigateToAddRequest(NavigateToAddRequestEvent event, Emitter<RequestState> emit) {
     if (event.context.mounted) {
-      // Pass the same BlocProvider down the tree so the new view can access it
-      Navigator.push(event.context, MaterialPageRoute(builder: (context) => RequestView(isAddForm: true)));
+      Navigator.push(
+        event.context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: BlocProvider.of<RequestViewModel>(event.context),
+            child: RequestView(isAddForm: true),
+          ),
+        ),
+      );
     }
   }
 

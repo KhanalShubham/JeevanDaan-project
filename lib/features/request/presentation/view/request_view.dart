@@ -8,6 +8,7 @@ import 'package:jeevandaan/features/request/presentation/view_model/request_even
 import 'package:jeevandaan/features/request/presentation/view_model/request_state.dart';
 import 'package:jeevandaan/features/request/presentation/view_model/request_view_model.dart';
 import 'package:intl/intl.dart';
+import 'package:jeevandaan/core/network/api_service.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -107,7 +108,6 @@ class RequestView extends StatelessWidget {
   }
 }
 
-// This is the actual UI page that consumes the ViewModel state
 class _RequestPage extends StatefulWidget {
   final bool isAddForm;
 
@@ -118,36 +118,46 @@ class _RequestPage extends StatefulWidget {
 }
 
 class _RequestPageState extends State<_RequestPage> {
-  // Controllers for Add Request form
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _neededAmountController = TextEditingController();
-  final TextEditingController _inDepthStoryController = TextEditingController();
-  final TextEditingController _citizenController = TextEditingController();
-  String _selectedCondition = 'moderate'; // Default value for add form
+  final _descriptionController = TextEditingController();
+  final _neededAmountController = TextEditingController();
+  final _inDepthStoryController = TextEditingController();
+  final _citizenController = TextEditingController();
 
   File? _supportingDocFile;
   File? _userImageFile;
   File? _citizenshipImageFile;
 
+  String _selectedCondition = 'critical';
+
   final ImagePicker _picker = ImagePicker();
+
+  bool _isOffline = false;
 
   @override
   void initState() {
     super.initState();
+    _checkConnectivity();
     // Fetch requests if it's the list view
     if (!widget.isAddForm) {
       context.read<RequestViewModel>().add(GetMyRequestsEvent());
     }
   }
 
+  Future<void> _checkConnectivity() async {
+    final online = await ConnectivityService().isOnline;
+    setState(() {
+      _isOffline = !online;
+    });
+  }
+
   @override
   void dispose() {
+    super.dispose();
     _descriptionController.dispose();
     _neededAmountController.dispose();
     _inDepthStoryController.dispose();
     _citizenController.dispose();
-    super.dispose();
   }
 
   // Updated _pickFile to handle both images (via ImagePicker) and documents (via FilePicker)
@@ -255,84 +265,42 @@ class _RequestPageState extends State<_RequestPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent, // Make app bar transparent
-        elevation: 0, // No shadow
-        centerTitle: true,
-        title: Text(
-          widget.isAddForm ? 'New Donation Request' : 'My Requests',
-          style: AppStyles.heading2.copyWith(color: AppColors.darkText),
+    if (_isOffline) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Requests')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.wifi_off, size: 64, color: Colors.orange),
+              SizedBox(height: 24),
+              Text('Connect to the internet and try again.', style: TextStyle(fontSize: 18, color: Colors.grey)),
+            ],
+          ),
         ),
-        leading: widget.isAddForm
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new,
-                    color: AppColors.darkText),
-                onPressed: () {
-                  context
-                      .read<RequestViewModel>()
-                      .add(NavigateBackFromAddRequestEvent(context: context));
-                },
-              )
-            : null,
-      ),
-      body: BlocConsumer<RequestViewModel, RequestState>(
-        listener: (context, state) {
-          if (state.isOperationSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text(state.successMessage ?? 'Operation successful!')),
-            );
-            if (widget.isAddForm) {
-              _formKey.currentState?.reset();
-              setState(() {
-                _descriptionController.clear();
-                _neededAmountController.clear();
-                _inDepthStoryController.clear();
-                _citizenController.clear();
-                _supportingDocFile = null;
-                _userImageFile = null;
-                _citizenshipImageFile = null;
-                _selectedCondition = 'moderate';
-              });
-            }
-            if (!widget.isAddForm) {
-              context.read<RequestViewModel>().add(GetMyRequestsEvent());
-            }
-          } else if (state.errorMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: ${state.errorMessage!}')),
-            );
-          }
-        },
-        builder: (context, state) {
-          if (widget.isAddForm) {
-            // Build Add Request Form
-            return _buildAddRequestForm(context, state);
-          } else {
-            // Build My Requests List
-            return _buildMyRequestsList(context, state);
-          }
-        },
-      ),
-      floatingActionButton: widget.isAddForm
-          ? null // No FAB on the add form
-          : FloatingActionButton.extended(
-              onPressed: () {
-                context
-                    .read<RequestViewModel>()
-                    .add(NavigateToAddRequestEvent(context: context));
-              },
-              icon: const Icon(Icons.add_rounded, color: AppColors.white),
-              label: const Text('New Request', style: TextStyle(color: AppColors.white)),
-              backgroundColor: AppColors.primaryRed,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              elevation: 8,
-            ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      );
+    }
+    return BlocBuilder<RequestViewModel, RequestState>(
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(widget.isAddForm ? 'Add Request' : 'Requests'),
+            actions: [
+              if (!widget.isAddForm)
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  tooltip: 'Add Request',
+                  onPressed: () {
+                    context.read<RequestViewModel>().add(NavigateToAddRequestEvent(context: context));
+                  },
+                ),
+            ],
+          ),
+          body: widget.isAddForm
+              ? _buildAddRequestForm(context, state)
+              : _buildMyRequestsList(context, state),
+        );
+      },
     );
   }
 

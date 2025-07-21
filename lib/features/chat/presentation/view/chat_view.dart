@@ -13,15 +13,51 @@ import 'package:jeevandaan/features/chat/presentation/view_model/chat_bloc.dart'
 import 'package:jeevandaan/features/chat/presentation/view_model/chat_event.dart';
 import 'package:jeevandaan/features/chat/presentation/view_model/chat_state.dart';
 import 'package:jeevandaan/features/chat/presentation/widgets/message_bubble.dart';
+import 'package:jeevandaan/core/network/api_service.dart';
 
 
-class ChatView extends StatelessWidget {
+class ChatView extends StatefulWidget {
   final String adminId = "686c20af7c56d92f3cfd9153";
 
   const ChatView({super.key});
 
   @override
+  State<ChatView> createState() => _ChatViewState();
+}
+
+class _ChatViewState extends State<ChatView> {
+  bool _isOffline = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkConnectivity();
+  }
+
+  Future<void> _checkConnectivity() async {
+    final online = await ConnectivityService().isOnline;
+    setState(() {
+      _isOffline = !online;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isOffline) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Chat')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.wifi_off, size: 64, color: Colors.orange),
+              SizedBox(height: 24),
+              Text('Connect to the internet and try again.', style: TextStyle(fontSize: 18, color: Colors.grey)),
+            ],
+          ),
+        ),
+      );
+    }
     return BlocProvider(
       create: (context) {
         // --- Start of Dummy Data (REPLACE THIS with your actual user logic) ---
@@ -47,9 +83,9 @@ class ChatView extends StatelessWidget {
         )
         // ✅ The errors are now fixed. These events can be added successfully.
         ..add(ConnectSocket())
-        ..add(FetchHistory(adminId));
+        ..add(FetchHistory(widget.adminId));
       },
-      child: ChatPage(adminId: adminId),
+      child: ChatPage(adminId: widget.adminId),
     );
   }
 }

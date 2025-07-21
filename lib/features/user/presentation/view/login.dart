@@ -12,6 +12,8 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jeevandaan/core/network/api_service.dart';
+import 'package:jeevandaan/features/user/data/repository/local_repository/user_local_repository_impl.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -92,6 +94,36 @@ class _LoginViewState extends State<LoginView> {
     }
   }
 
+  Future<void> _handleLoginOfflineBanner(BuildContext context, bool isOffline, bool localAvailable) async {
+    if (isOffline && localAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You are offline. Logging in with local data.'), backgroundColor: Colors.orange),
+      );
+    } else if (isOffline && !localAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You are offline and no local data is available.'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  Future<void> _storeLoginTimestamp() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('last_login_timestamp', DateTime.now().millisecondsSinceEpoch);
+  }
+
+  Future<bool> _isLoginValid() async {
+    final prefs = await SharedPreferences.getInstance();
+    final timestamp = prefs.getInt('last_login_timestamp');
+    if (timestamp == null) return false;
+    final lastLogin = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    return DateTime.now().difference(lastLogin) < Duration(days: 1);
+  }
+
+  Future<void> _clearLoginTimestamp() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('last_login_timestamp');
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -106,8 +138,15 @@ class _LoginViewState extends State<LoginView> {
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: BlocListener<LoginViewModel, LoginState>(
-          listener: (context, state) {
+          listener: (context, state) async {
+            final isOffline = !(await ConnectivityService().isOnline);
+            // Assume local data is available if UserLocalRepositoryImpl is registered in service locator
+            final localAvailable = true; // Set to true if you always have local repo, or check via service locator
+            if (state is LoginSuccess || state is LoginFailure) {
+              await _handleLoginOfflineBanner(context, isOffline, localAvailable);
+            }
             if (state is LoginSuccess) {
+              await _storeLoginTimestamp();
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => const MainNavigationView()),
                 (route) => false,

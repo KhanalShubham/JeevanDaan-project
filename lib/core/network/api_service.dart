@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:jeevandaan/app/constant/api_endpoints.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:jeevandaan/app/shared_pref/token_shared_prefs.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class ApiService {
   final Dio _dio;
@@ -42,5 +43,12 @@ class ApiService {
           responseHeader: true,
         ),
       );
+  }
+}
+
+class ConnectivityService {
+  Future<bool> get isOnline async {
+    final result = await Connectivity().checkConnectivity();
+    return result != ConnectivityResult.none;
   }
 }

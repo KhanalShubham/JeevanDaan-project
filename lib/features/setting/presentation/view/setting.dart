@@ -104,6 +104,35 @@ class SettingPage extends StatelessWidget {
               ),
             ),
           ),
+          // Sensor Settings
+          Consumer<SensorSettingsNotifier>(
+            builder: (context, sensorSettings, _) => Column(
+              children: [
+                Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 4,
+                  child: SwitchListTile(
+                    title: const Text('Sensor-based Navigation'),
+                    subtitle: const Text('Switch tabs by rotating your device'),
+                    value: sensorSettings.sensorNavigationEnabled,
+                    onChanged: sensorSettings.setSensorNavigation,
+                  ),
+                ),
+                Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 4,
+                  child: SwitchListTile(
+                    title: const Text('Shake to Logout'),
+                    subtitle: const Text('Log out by shaking your device'),
+                    value: sensorSettings.shakeLogoutEnabled,
+                    onChanged: sensorSettings.setShakeLogout,
+                  ),
+                ),
+              ],
+            ),
+          ),
           // Update Name
           _settingsTile(context, icon: Icons.person, title: 'Update Name', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UpdateNamePage()))),
           // Update Description
@@ -1134,5 +1163,20 @@ class _SettingsSubPage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class SensorSettingsNotifier extends ChangeNotifier {
+  bool sensorNavigationEnabled = true;
+  bool shakeLogoutEnabled = true;
+
+  void setSensorNavigation(bool value) {
+    sensorNavigationEnabled = value;
+    notifyListeners();
+  }
+
+  void setShakeLogout(bool value) {
+    shakeLogoutEnabled = value;
+    notifyListeners();
   }
 }

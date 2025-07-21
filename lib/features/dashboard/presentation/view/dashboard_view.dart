@@ -11,10 +11,16 @@ import 'package:shimmer/shimmer.dart';
 import 'package:provider/provider.dart';
 import 'package:jeevandaan/app/user_notifier.dart';
 import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
-
+import 'dart:async';
+import 'package:sensors_plus/sensors_plus.dart';
+import 'package:jeevandaan/features/user/presentation/view/login.dart';
 import '../view_model/dashboard_event.dart';
 import '../view_model/dashboard_state.dart';
 import '../view_model/dashboard_view_model.dart';
+import 'package:jeevandaan/features/dashboard/presentation/view/mainnavigation.dart';
+import 'package:jeevandaan/features/setting/presentation/view/setting.dart';
+import 'package:jeevandaan/core/network/api_service.dart';
+import 'dart:math';
 
 // Using a custom theme file is great practice, but for this example,
 // we define a refined color palette here.
@@ -43,86 +49,264 @@ class DashboardView extends StatelessWidget {
 }
 
 // The UI Masterpiece
-class _DashboardPage extends StatelessWidget {
+class _DashboardPage extends StatefulWidget {
   const _DashboardPage();
+
+  @override
+  State<_DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<_DashboardPage> {
+  AccelerometerEvent? _accelerometer;
+  GyroscopeEvent? _gyroscope;
+
+  StreamSubscription? _accelSub;
+  StreamSubscription? _gyroSub;
+
+  int _shakeCount = 0;
+  DateTime? _lastShakeTime;
+  bool _gyroTriggered = false;
+
+  final List<String> _quotes = [
+    'Believe you can and you’re halfway there.',
+    'Every day is a second chance.',
+    'Stay positive, work hard, make it happen.',
+    'Difficult roads often lead to beautiful destinations.',
+    'You are stronger than you think.',
+    'Success is not for the lazy.',
+    'Dream big and dare to fail.',
+    'Push yourself, because no one else is going to do it for you.',
+    'Great things never come from comfort zones.',
+    'Don’t watch the clock; do what it does. Keep going.',
+  ];
+  bool _isOffline = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _accelSub = accelerometerEvents.listen(_onAccelerometer);
+    _gyroSub = gyroscopeEvents.listen(_onGyroscope);
+    _checkConnectivity();
+  }
+
+  Future<void> _checkConnectivity() async {
+    final online = await ConnectivityService().isOnline;
+    setState(() {
+      _isOffline = !online;
+    });
+  }
+
+  void _onAccelerometer(AccelerometerEvent event) {
+    final sensorSettings = Provider.of<SensorSettingsNotifier>(context, listen: false);
+    if (!sensorSettings.shakeLogoutEnabled) return;
+    debugPrint('Accelerometer: x= [1m [1m${event.x} [0m, y=${event.y}, z=${event.z}');
+    setState(() => _accelerometer = event);
+    final now = DateTime.now();
+    if ((event.x.abs() > 15 || event.y.abs() > 15 || event.z.abs() > 15)) {
+      if (_lastShakeTime == null || now.difference(_lastShakeTime!) > Duration(seconds: 1)) {
+        _shakeCount = 1;
+      } else {
+        _shakeCount++;
+      }
+      _lastShakeTime = now;
+      if (_shakeCount >= 2) {
+        _showLogoutConfirmation();
+        _shakeCount = 0;
+      }
+    }
+  }
+
+  void _showLogoutConfirmation() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Do you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('No'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+    if (shouldLogout == true) {
+      _triggerLogout('Logged out by shake!');
+    }
+  }
+
+  void _onGyroscope(GyroscopeEvent event) {
+    final sensorSettings = Provider.of<SensorSettingsNotifier>(context, listen: false);
+    if (!sensorSettings.sensorNavigationEnabled) return;
+    debugPrint('Gyroscope: x= [1m${event.x} [0m, y=${event.y}, z=${event.z}');
+    setState(() => _gyroscope = event);
+    if (!_gyroTriggered && (event.x.abs() > 5 || event.y.abs() > 5 || event.z.abs() > 5)) {
+      _gyroTriggered = true;
+      // Switch to next tab
+      final currentTab = MainNavigationView.tabNotifier.value;
+      final nextTab = (currentTab + 1) % 5; // 5 tabs
+      MainNavigationView.tabNotifier.value = nextTab;
+      final tabNames = ['Dashboard', 'Request', 'Message', 'Notifications', 'Setting'];
+      final tabName = tabNames[nextTab];
+      _showSensorAction('Switched to "$tabName" tab!');
+      Future.delayed(Duration(seconds: 2), () => _gyroTriggered = false);
+    }
+  }
+
+  void _triggerLogout(String message) {
+    // Clear user state
+    Provider.of<UserNotifier>(context, listen: false).clearUser();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginView()),
+      (route) => false,
+    );
+  }
+
+  void _showSensorAction(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  @override
+  void dispose() {
+    _accelSub?.cancel();
+    _gyroSub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.background,
-      body: Consumer<UserNotifier>(
-        builder: (context, userNotifier, _) {
-          return BlocBuilder<DashboardViewModel, DashboardState>(
-            builder: (context, state) {
-              final user = userNotifier.user ?? state.user;
-              if (state.isLoading && user == null) {
-                return _buildLoadingSkeleton();
-              }
-              if (state.errorMessage != null) {
-                return Center(
-                  child: Text(
-                    'Error:  {state.errorMessage}',
-                    style: GoogleFonts.inter(color: AppTheme.secondaryText),
+      body: Column(
+        children: [
+          if (_isOffline)
+            Container(
+              width: double.infinity,
+              color: Colors.orange,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              child: const Text(
+                'You are offline. Connect to WiFi or internet to get real-time dashboard.',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          Expanded(
+            child: _isOffline
+                ? _buildOfflineDashboard()
+                : Consumer<UserNotifier>(
+                    builder: (context, userNotifier, _) {
+                      return BlocBuilder<DashboardViewModel, DashboardState>(
+                        builder: (context, state) {
+                          final user = userNotifier.user ?? state.user;
+                          if (state.isLoading && user == null) {
+                            return _buildLoadingSkeleton();
+                          }
+                          if (state.errorMessage != null) {
+                            return Center(
+                              child: Text(
+                                'Error:  {state.errorMessage}',
+                                style: GoogleFonts.inter(color: AppTheme.secondaryText),
+                              ),
+                            );
+                          }
+                          return RefreshIndicator(
+                            onRefresh: () async {
+                              await _checkConnectivity();
+                              context.read<DashboardViewModel>().add(FetchDashboardData());
+                            },
+                            color: AppTheme.primaryRed,
+                            child: CustomScrollView(
+                              slivers: [
+                                _buildHeader(context, user),
+                                SliverList(
+                                  delegate: SliverChildListDelegate(
+                                    [
+                                      const SizedBox(height: 16),
+                                      // Campaign carousel in a card
+                                      Card(
+                                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                                        elevation: 6,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: _buildCampaignCarousel(context)
+                                              .animate().fadeIn(delay: 200.ms, duration: 400.ms).slideY(begin: 0.1),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 24),
+                                      // Quick actions in a card
+                                      Card(
+                                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                                        elevation: 6,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                                          child: _buildQuickActions(context)
+                                              .animate().fadeIn(delay: 300.ms, duration: 400.ms).slideY(begin: 0.1),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 24),
+                                      // Requests section in a card
+                                      Card(
+                                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                                        elevation: 6,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: _buildRequestsSection(context, state)
+                                              .animate().fadeIn(delay: 400.ms, duration: 400.ms),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 32),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
-                );
-              }
-              return RefreshIndicator(
-                onRefresh: () async {
-                  context.read<DashboardViewModel>().add(FetchDashboardData());
-                },
-                color: AppTheme.primaryRed,
-                child: CustomScrollView(
-                  slivers: [
-                    _buildHeader(context, user),
-                    SliverList(
-                      delegate: SliverChildListDelegate(
-                        [
-                          const SizedBox(height: 16),
-                          // Campaign carousel in a card
-                          Card(
-                            margin: const EdgeInsets.symmetric(horizontal: 16),
-                            elevation: 6,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: _buildCampaignCarousel(context)
-                                  .animate().fadeIn(delay: 200.ms, duration: 400.ms).slideY(begin: 0.1),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          // Quick actions in a card
-                          Card(
-                            margin: const EdgeInsets.symmetric(horizontal: 16),
-                            elevation: 6,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 20.0),
-                              child: _buildQuickActions(context)
-                                  .animate().fadeIn(delay: 300.ms, duration: 400.ms).slideY(begin: 0.1),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          // Requests section in a card
-                          Card(
-                            margin: const EdgeInsets.symmetric(horizontal: 16),
-                            elevation: 6,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: _buildRequestsSection(context, state)
-                                  .animate().fadeIn(delay: 400.ms, duration: 400.ms),
-                            ),
-                          ),
-                          const SizedBox(height: 32),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOfflineDashboard() {
+    final quote = _quotes[Random().nextInt(_quotes.length)];
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.wifi_off, size: 64, color: Colors.orange.withOpacity(0.7)),
+            const SizedBox(height: 24),
+            Text(
+              'Offline Mode',
+              style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primaryRed),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              quote,
+              style: GoogleFonts.inter(fontSize: 18, fontStyle: FontStyle.italic, color: AppTheme.secondaryText),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Reconnect to the internet for real-time updates and features.',
+              style: TextStyle(color: Colors.grey, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -346,12 +530,27 @@ class _DashboardPage extends StatelessWidget {
   // --- Unchanged Widgets Below ---
 
   Widget _buildRequestsSection(BuildContext context, DashboardState state) {
+    final requests = state.filteredRequests;
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Your Recent Requests', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.darkText)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Your Recent Requests', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.darkText)),
+              if (requests.length > 3)
+                TextButton(
+                  onPressed: () {
+                    // TODO: Navigate to all requests page
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('See All Requests coming soon!')));
+                  },
+                  child: const Text('See All'),
+                ),
+            ],
+          ),
           const SizedBox(height: 16),
           // Search Field
           TextField(
@@ -366,16 +565,15 @@ class _DashboardPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          // Requests List
-          if (state.filteredRequests.isEmpty)
-            _buildEmptyState()
+          if (requests.isEmpty)
+            _buildEmptyState(theme)
           else
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: state.filteredRequests.length > 5 ? 5 : state.filteredRequests.length,
+              itemCount: requests.length > 3 ? 3 : requests.length,
               itemBuilder: (context, index) {
-                return _buildRequestCard(state.filteredRequests[index])
+                return _buildRequestCard(requests[index], theme)
                     .animate()
                     .fadeIn(delay: (100 * index).ms, duration: 500.ms)
                     .slideY(begin: 0.2, curve: Curves.easeOut);
@@ -386,18 +584,19 @@ class _DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(ThemeData theme) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
       child: Center(
         child: Column(
           children: [
-            const Icon(Icons.inbox_outlined, size: 60, color: Color(0xFFBDBDBD)),
+            // Use a friendly illustration (replace with your asset if available)
+            Icon(Icons.inbox_outlined, size: 80, color: theme.colorScheme.primary.withOpacity(0.2)),
             const SizedBox(height: 16),
             Text('No requests found.', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600, color: AppTheme.darkText)),
             const SizedBox(height: 4),
             Text(
-              'Your active and past requests will appear here.',
+              'Your active and past requests will appear here. Tap the + button to add a new request!',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(fontSize: 14, color: AppTheme.secondaryText),
             ),
@@ -407,7 +606,7 @@ class _DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRequestCard(RequestEntity request) {
+  Widget _buildRequestCard(RequestEntity request, ThemeData theme) {
     Color statusColor;
     String statusText;
     IconData statusIcon;
@@ -453,7 +652,7 @@ class _DashboardPage extends StatelessWidget {
                 child: Text(
                   request.description,
                   style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 16, color: AppTheme.darkText),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -493,6 +692,23 @@ class _DashboardPage extends StatelessWidget {
                 ),
             ],
           ),
+          if (request.userImage.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                request.userImage,
+                height: 120,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: 120,
+                  color: Colors.grey[200],
+                  child: const Center(child: Icon(Icons.broken_image, size: 40)),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

@@ -3,12 +3,48 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jeevandaan/app/themes/themes.dart';
 import 'package:jeevandaan/features/notification/presentation/view_model/notification_view_model.dart';
 import 'package:lottie/lottie.dart';
+import 'package:jeevandaan/core/network/api_service.dart';
 
-class NotificationScreen extends StatelessWidget {
+class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
 
   @override
+  State<NotificationScreen> createState() => _NotificationScreenState();
+}
+
+class _NotificationScreenState extends State<NotificationScreen> {
+  bool _isOffline = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkConnectivity();
+  }
+
+  Future<void> _checkConnectivity() async {
+    final online = await ConnectivityService().isOnline;
+    setState(() {
+      _isOffline = !online;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isOffline) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Notifications')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.wifi_off, size: 64, color: Colors.orange),
+              SizedBox(height: 24),
+              Text('Connect to the internet and try again.', style: TextStyle(fontSize: 18, color: Colors.grey)),
+            ],
+          ),
+        ),
+      );
+    }
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,

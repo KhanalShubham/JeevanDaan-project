@@ -60,7 +60,12 @@ class DashboardViewModel extends Bloc<DashboardEvent, DashboardState> {
   void _onNavigateToNewRequest(NavigateToNewRequest event, Emitter<DashboardState> emit) {
     Navigator.push(
       event.context,
-      MaterialPageRoute(builder: (context) => const RequestView(isAddForm: true)),
+      MaterialPageRoute(
+        builder: (context) => BlocProvider.value(
+          value: BlocProvider.of<DashboardViewModel>(event.context),
+          child: const RequestView(isAddForm: true),
+        ),
+      ),
     );
   }
 }
