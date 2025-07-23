@@ -12,7 +12,6 @@ import 'package:provider/provider.dart';
 import 'package:jeevandaan/app/user_notifier.dart';
 import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
 import 'dart:async';
-import 'package:sensors_plus/sensors_plus.dart';
 import 'package:jeevandaan/features/user/presentation/view/login.dart';
 import '../view_model/dashboard_event.dart';
 import '../view_model/dashboard_state.dart';
@@ -21,6 +20,7 @@ import 'package:jeevandaan/features/dashboard/presentation/view/mainnavigation.d
 import 'package:jeevandaan/features/setting/presentation/view/setting.dart';
 import 'package:jeevandaan/core/network/api_service.dart';
 import 'dart:math';
+import 'package:sensors_plus/sensors_plus.dart';
 
 // Using a custom theme file is great practice, but for this example,
 // we define a refined color palette here.

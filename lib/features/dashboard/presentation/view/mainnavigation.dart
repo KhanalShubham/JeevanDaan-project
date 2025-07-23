@@ -11,10 +11,10 @@ import 'package:jeevandaan/features/notification/presentation/views/notification
 import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
 import 'package:jeevandaan/features/notification/presentation/view_model/notification_view_model.dart';
 import 'package:jeevandaan/features/setting/presentation/view_model/setting_view_model.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 import 'package:jeevandaan/features/setting/presentation/view/setting.dart';
 import 'package:jeevandaan/app/user_notifier.dart';
 import 'package:jeevandaan/features/user/presentation/view/login.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 
 class MainNavigationView extends StatefulWidget {
   const MainNavigationView({super.key});
