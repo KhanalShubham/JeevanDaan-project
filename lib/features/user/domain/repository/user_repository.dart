@@ -17,6 +17,7 @@ abstract interface class IUserRepository {
       required String description,
       required String contact,
       required String disease,
+      String? photoUrl,
     }
   );
 }

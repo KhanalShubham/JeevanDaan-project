@@ -74,16 +74,18 @@ class UserRemoteDatasource implements IUserDataSource {
     }
   }
 
-  Future<UserEntity> updateMe(String token, {required String name, required String description, required String contact, required String disease}) async {
+  Future<UserEntity> updateMe(String token, {required String name, required String description, required String contact, required String disease, String? photoUrl}) async {
     try {
+      final data = {
+        'name': name,
+        'description': description,
+        'contact': contact,
+        'disease': disease,
+      };
+      if (photoUrl != null) data['photoUrl'] = photoUrl;
       final response = await _apiService.dio.put(
-        ApiEndpoints.updateProfile,
-        data: {
-          'name': name,
-          'description': description,
-          'contact': contact,
-          'disease': disease,
-        },
+        ApiEndpoints.updateMe, // <-- use the correct endpoint
+        data: data,
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
       if (response.statusCode == 200 && response.data['data'] != null) {

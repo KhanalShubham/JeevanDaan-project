@@ -49,6 +49,7 @@ class UserLocalRepositoryImpl implements IUserRepository{
       required String description,
       required String contact,
       required String disease,
+      String? photoUrl,
     }
   ) async {
     // Implement your local update logic or return an error for now

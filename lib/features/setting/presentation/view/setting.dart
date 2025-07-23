@@ -8,6 +8,11 @@ import 'package:jeevandaan/features/setting/domain/use_case/update_profile_use_c
 import 'package:jeevandaan/app/service_locator/service_locator.dart';
 import 'package:jeevandaan/app/shared_pref/token_shared_prefs.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:jeevandaan/core/network/api_service.dart';
+import 'package:jeevandaan/app/constant/api_endpoints.dart';
+import 'package:dio/dio.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({super.key});
@@ -42,12 +47,87 @@ class SettingPage extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          CircleAvatar(
-                            radius: 28,
-                            child: Text(
-                              user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
-                              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                            ),
+                          Stack(
+                            children: [
+                              user.photoUrl != null && user.photoUrl!.isNotEmpty
+                                  ? CircleAvatar(
+                                      radius: 28,
+                                      backgroundImage: NetworkImage(user.photoUrl!),
+                                    )
+                                  : CircleAvatar(
+                                      radius: 28,
+                                      child: Text(
+                                        user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
+                                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final picker = ImagePicker();
+                                    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                                    if (pickedFile != null) {
+                                      final apiService = serviceLocator<ApiService>();
+                                      final dio = apiService.dio;
+                                      try {
+                                        final formData = FormData.fromMap({
+                                          'file': await MultipartFile.fromFile(pickedFile.path, filename: pickedFile.name),
+                                        });
+                                        final response = await dio.post(
+                                          ApiEndpoints.uploadChatFile, // Using chat upload endpoint for now
+                                          data: formData,
+                                        );
+                                        if (response.statusCode == 201 && response.data['fileUrl'] != null) {
+                                          final photoUrl = apiService.dio.options.baseUrl.replaceFirst('/api/', '') + response.data['fileUrl'];
+                                          // Now update the user profile with the new photoUrl
+                                          final userNotifier = Provider.of<UserNotifier>(context, listen: false);
+                                          final user = userNotifier.user;
+                                          if (user != null) {
+                                            final updateProfileUseCase = serviceLocator<UpdateProfileUseCase>();
+                                            final tokenSharedPrefs = serviceLocator<TokenSharedPrefs>();
+                                            final tokenResult = await tokenSharedPrefs.getToken();
+                                            String? token;
+                                            tokenResult.fold((failure) => token = null, (t) => token = t);
+                                            if ((token ?? '').isNotEmpty) {
+                                              final updatedUser = await updateProfileUseCase(
+                                                token!,
+                                                name: user.name,
+                                                description: user.description,
+                                                contact: user.contact,
+                                                disease: user.disease,
+                                                photoUrl: photoUrl,
+                                              );
+                                              updatedUser.fold(
+                                                (failure) => ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(content: Text(failure.message ?? 'Failed to update photo.'), backgroundColor: Colors.red),
+                                                ),
+                                                (newUser) {
+                                                  userNotifier.setUser(newUser.copyWith(photoUrl: photoUrl));
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    const SnackBar(content: Text('Profile photo updated!'), backgroundColor: Colors.green),
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          }
+                                        }
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Failed to upload photo: $e'), backgroundColor: Colors.red),
+                                        );
+                                      }
+                                    }
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 12,
+                                    backgroundColor: Colors.white,
+                                    child: Icon(Icons.edit, size: 16, color: theme.colorScheme.primary),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -299,6 +379,7 @@ class _UpdateNamePageState extends State<UpdateNamePage> {
                                 description: user.description,
                                 contact: user.contact,
                                 disease: user.disease,
+                                photoUrl: user.photoUrl,
                               );
                               updatedUser.fold(
                                 (failure) => setState(() => _errorMessage = failure.message ?? 'Failed to update name.'),
@@ -422,6 +503,7 @@ class _UpdateDiseasePageState extends State<UpdateDiseasePage> {
                                 description: user.description,
                                 contact: user.contact,
                                 disease: _diseaseController.text,
+                                photoUrl: user.photoUrl,
                               );
                               updatedUser.fold(
                                 (failure) => setState(() => _errorMessage = failure.message ?? 'Failed to update disease.'),
@@ -545,6 +627,7 @@ class _UpdateContactPageState extends State<UpdateContactPage> {
                                 description: user.description,
                                 contact: _contactController.text,
                                 disease: user.disease,
+                                photoUrl: user.photoUrl,
                               );
                               updatedUser.fold(
                                 (failure) => setState(() => _errorMessage = failure.message ?? 'Failed to update contact.'),
@@ -669,6 +752,7 @@ class _UpdateDescriptionPageState extends State<UpdateDescriptionPage> {
                                 description: _descriptionController.text,
                                 contact: user.contact,
                                 disease: user.disease,
+                                photoUrl: user.photoUrl,
                               );
                               updatedUser.fold(
                                 (failure) => setState(() => _errorMessage = failure.message ?? 'Failed to update description.'),

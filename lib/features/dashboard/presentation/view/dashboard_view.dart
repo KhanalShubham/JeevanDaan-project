@@ -360,14 +360,20 @@ class _DashboardPageState extends State<_DashboardPage> {
       toolbarHeight: 80,
       title: Row(
         children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: AppTheme.primaryRedLight,
-            child: Text(
-              user?.name.isNotEmpty == true ? user!.name[0].toUpperCase() : 'U',
-              style: GoogleFonts.inter(color: AppTheme.primaryRed, fontWeight: FontWeight.bold, fontSize: 22),
-            ),
-          ),
+          user?.photoUrl != null && user!.photoUrl!.isNotEmpty
+              ? CircleAvatar(
+                  radius: 24,
+                  backgroundImage: NetworkImage(user.photoUrl!),
+                  backgroundColor: AppTheme.primaryRedLight,
+                )
+              : CircleAvatar(
+                  radius: 24,
+                  backgroundColor: AppTheme.primaryRedLight,
+                  child: Text(
+                    user?.name.isNotEmpty == true ? user!.name[0].toUpperCase() : 'U',
+                    style: GoogleFonts.inter(color: AppTheme.primaryRed, fontWeight: FontWeight.bold, fontSize: 22),
+                  ),
+                ),
           const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -676,14 +682,15 @@ class _DashboardPageState extends State<_DashboardPage> {
             ],
           ),
           const Divider(height: 24, thickness: 0.5),
-          Row(
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
             children: [
               _infoChip(
                 Icons.account_balance_wallet_rounded,
                 'Needed: Rs. ${NumberFormat('#,##0').format(request.neededAmount)}',
                 const Color(0xFF6A1B9A),
               ),
-              const SizedBox(width: 12),
               if (request.createdAt != null)
                 _infoChip(
                   Icons.calendar_today_rounded,
@@ -692,23 +699,7 @@ class _DashboardPageState extends State<_DashboardPage> {
                 ),
             ],
           ),
-          if (request.userImage.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                request.userImage,
-                height: 120,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  height: 120,
-                  color: Colors.grey[200],
-                  child: const Center(child: Icon(Icons.broken_image, size: 40)),
-                ),
-              ),
-            ),
-          ],
+          // All images removed as per user request
         ],
       ),
     );

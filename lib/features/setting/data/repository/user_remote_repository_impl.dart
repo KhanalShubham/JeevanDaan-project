@@ -49,9 +49,9 @@ Future<Either<Failure, void>> registerUser(UserEntity user) async {
   }
 
   @override
-  Future<Either<Failure, UserEntity>> updateMe(String token, {required String name, required String description, required String contact, required String disease}) async {
+  Future<Either<Failure, UserEntity>> updateMe(String token, {required String name, required String description, required String contact, required String disease, String? photoUrl}) async {
     try {
-      final user = await _userRemoteDatasource.updateMe(token, name: name, description: description, contact: contact, disease: disease);
+      final user = await _userRemoteDatasource.updateMe(token, name: name, description: description, contact: contact, disease: disease, photoUrl: photoUrl);
       return Right(user);
     } catch (e) {
       return Left(RemoteDatabaseFailure(message: e.toString()));

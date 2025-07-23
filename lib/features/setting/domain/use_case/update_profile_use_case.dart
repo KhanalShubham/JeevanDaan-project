@@ -7,7 +7,7 @@ class UpdateProfileUseCase {
   final IUserRepository repository;
   UpdateProfileUseCase(this.repository);
 
-  Future<Either<Failure, UserEntity>> call(String token, {required String name, required String description, required String contact, required String disease}) {
-    return repository.updateMe(token, name: name, description: description, contact: contact, disease: disease);
+  Future<Either<Failure, UserEntity>> call(String token, {required String name, required String description, required String contact, required String disease, String? photoUrl}) {
+    return repository.updateMe(token, name: name, description: description, contact: contact, disease: disease, photoUrl: photoUrl);
   }
 } 

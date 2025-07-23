@@ -70,6 +70,7 @@ Future<Either<Failure, void>> registerUser(UserEntity user) async {
       required String description,
       required String contact,
       required String disease,
+      String? photoUrl,
     }
   ) async {
     try {
@@ -79,6 +80,7 @@ Future<Either<Failure, void>> registerUser(UserEntity user) async {
         description: description,
         contact: contact,
         disease: disease,
+        photoUrl: photoUrl,
       );
       return Right(user);
     } catch (e) {
