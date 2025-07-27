@@ -15,6 +15,7 @@ class UserApiModel extends Equatable {
   final String description;
   final String? password;
   final String? photoUrl;
+  final String role; // 'user' or 'admin'
 
   const UserApiModel({
     this.userId,
@@ -25,6 +26,7 @@ class UserApiModel extends Equatable {
     required this.description,
     this.password,
     this.photoUrl,
+    required this.role,
   });
 
   const UserApiModel.empty()
@@ -35,7 +37,8 @@ class UserApiModel extends Equatable {
         contact = '',
         description = '',
         password = '',
-        photoUrl = null;
+        photoUrl = null,
+        role = 'user';
 
   factory UserApiModel.fromJson(Map<String, dynamic> json) =>
       _$UserApiModelFromJson(json);
@@ -50,6 +53,7 @@ class UserApiModel extends Equatable {
         description: entity.description,
         password: entity.password,
         photoUrl: entity.photoUrl,
+        role: entity.role,
       );
 
   UserEntity toEntity() => UserEntity(
@@ -61,6 +65,7 @@ class UserApiModel extends Equatable {
         contact: contact,
         description: description,
         photoUrl: photoUrl,
+        role: role,
       );
 
   static List<UserEntity> toEntityList(List<UserApiModel> model) =>
@@ -76,5 +81,6 @@ class UserApiModel extends Equatable {
         description,
         password,
         photoUrl,
+        role,
       ];
 }

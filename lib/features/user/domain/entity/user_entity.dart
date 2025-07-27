@@ -9,8 +9,19 @@ class UserEntity extends Equatable {
   final String contact;
   final String description;
   final String? photoUrl;
+  final String role; // 'user' or 'admin'
 
-  const UserEntity({this.userId, required this.name,required this.email,required this.disease,required this.password, required this.contact, required this.description, this.photoUrl});
+  const UserEntity({
+    this.userId,
+    required this.name,
+    required this.email,
+    required this.disease,
+    required this.password,
+    required this.contact,
+    required this.description,
+    this.photoUrl,
+    required this.role,
+  });
   
   UserEntity copyWith({
     String? userId,
@@ -21,6 +32,7 @@ class UserEntity extends Equatable {
     String? contact,
     String? description,
     String? photoUrl,
+    String? role,
   }) {
     return UserEntity(
       userId: userId ?? this.userId,
@@ -31,9 +43,10 @@ class UserEntity extends Equatable {
       contact: contact ?? this.contact,
       description: description ?? this.description,
       photoUrl: photoUrl ?? this.photoUrl,
+      role: role ?? this.role,
     );
   }
   
   @override
-  List<Object?> get props => [userId,name,email,password, description, contact, photoUrl];
+  List<Object?> get props => [userId, name, email, password, description, contact, photoUrl, role];
 }

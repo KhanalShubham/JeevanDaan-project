@@ -32,6 +32,7 @@ void main() {
           addRequestUseCase: addRequestUseCase,
           getMyRequestsUseCase: getMyRequestsUseCase,
           deleteRequestUseCase: deleteRequestUseCase,
+          getAllRequestsForAdminUseCase: ({String? status, String? date, required String token}) async => Left(ServerFailure(message: 'not implemented')),
         );
       },
       act: (bloc) => bloc.add(GetMyRequestsEvent()),

@@ -4,6 +4,7 @@ import 'package:jeevandaan/core/network/api_service.dart';
 import 'package:jeevandaan/features/user/data/data_source/user_data_source.dart';
 import 'package:jeevandaan/features/user/data/models/user_api_model.dart';
 import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
+import 'package:jeevandaan/features/user/domain/entity/login_response.dart';
 
 class UserRemoteDatasource implements IUserDataSource {
   final ApiService _apiService;
@@ -12,15 +13,16 @@ class UserRemoteDatasource implements IUserDataSource {
       : _apiService = apiService;
 
   @override
-  Future<String> login(String email, String password) async {
+  Future<LoginResponse> login(String email, String password) async {
     try {
       final response = await _apiService.dio.post(
         ApiEndpoints.login,
         data: {"email": email, "password": password},
       );
       if (response.statusCode == 200) {
-        final str = response.data["token"] as String;
-        return str;
+        final token = response.data["token"] as String;
+        final role = response.data["user"]?["role"] ?? response.data["role"] ?? "user";
+        return LoginResponse(token: token, role: role);
       } else {
         throw Exception(response.statusMessage);
       }

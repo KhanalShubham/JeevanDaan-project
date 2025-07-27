@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:jeevandaan/core/error/failure.dart';
 import 'package:jeevandaan/features/user/data/data_source/local_data_source/user_local_data_source.dart';
 import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
+import 'package:jeevandaan/features/user/domain/entity/login_response.dart';
 import 'package:jeevandaan/features/user/domain/repository/user_repository.dart';
 
 class UserLocalRepositoryImpl implements IUserRepository{
@@ -10,11 +11,11 @@ class UserLocalRepositoryImpl implements IUserRepository{
   UserLocalRepositoryImpl({required UserLocalDataSource userLocalDataSource}):_userLocalDataSource=userLocalDataSource;
 
   @override
-  Future<Either<Failure, String>> login(String email, String password)async {
-    try{
-      final result=await _userLocalDataSource.login(email, password);
+  Future<Either<Failure, LoginResponse>> login(String email, String password) async {
+    try {
+      final result = await _userLocalDataSource.login(email, password);
       return Right(result);
-    }catch(e){
+    } catch (e) {
       return left(LocalDatabaseFailure(message: "Failed to login: $e"));
     }
   }

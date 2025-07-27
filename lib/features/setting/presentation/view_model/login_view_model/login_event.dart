@@ -1,4 +1,5 @@
-part of 'login_view_model.dart';
+import 'package:equatable/equatable.dart';
+
 
 abstract class LoginEvent extends Equatable {
   const LoginEvent();

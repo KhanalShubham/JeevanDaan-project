@@ -95,4 +95,38 @@ class RequestRepositoryImpl implements IRequestRepository {
       return Left(RemoteDatabaseFailure(message: 'No internet and no local data source available.'));
     }
   }
+
+  @override
+  Future<Either<Failure, List<RequestEntity>>> getAllRequestsForAdmin({String? status, String? date, required String token}) async {
+    final online = await _connectivityService.isOnline;
+    if (online) {
+      try {
+        final requests = await remoteDataSource.getAllRequestsForAdmin(status: status, date: date, token: token);
+        return Right(requests);
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: e.message));
+      } catch (e) {
+        return Left(RemoteDatabaseFailure(message: e.toString()));
+      }
+    } else {
+      return Left(RemoteDatabaseFailure(message: 'No internet available.'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateRequestStatus({required String requestId, required String status, required num neededAmount, required String feedback, required String token}) async {
+    final online = await _connectivityService.isOnline;
+    if (online) {
+      try {
+        await remoteDataSource.updateRequestStatus(requestId: requestId, status: status, neededAmount: neededAmount, feedback: feedback, token: token);
+        return const Right(null);
+      } on ServerException catch (e) {
+        return Left(ServerFailure(message: e.message));
+      } catch (e) {
+        return Left(RemoteDatabaseFailure(message: e.toString()));
+      }
+    } else {
+      return Left(RemoteDatabaseFailure(message: 'No internet available.'));
+    }
+  }
 }

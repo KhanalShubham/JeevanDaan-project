@@ -14,6 +14,10 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jeevandaan/core/network/api_service.dart';
 import 'package:jeevandaan/features/user/data/repository/local_repository/user_local_repository_impl.dart';
+import 'package:jeevandaan/features/request/presentation/view/admin_request_view.dart';
+import 'package:jeevandaan/features/request/presentation/view_model/admin_request_view_model.dart';
+import 'package:jeevandaan/features/request/data/repository/request_repository_impl.dart';
+import 'package:jeevandaan/features/request/domain/repository/request_repository.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -53,7 +57,10 @@ class _LoginViewState extends State<LoginView> {
   Future<void> _checkAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('jwt_token');
-    if (token != null && token.isNotEmpty) {
+    final userRole = prefs.getString('user_role'); // Check stored role
+    
+    // Only auto-login for regular users, not admins
+    if (token != null && token.isNotEmpty && userRole != 'admin') {
       // TODO: Optionally validate token with backend
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const MainNavigationView()),
@@ -78,11 +85,26 @@ class _LoginViewState extends State<LoginView> {
         await prefs.setString('jwt_token', data['token']);
         await prefs.setString('user_name', data['user']['name'] ?? '');
         await prefs.setString('user_email', data['user']['email'] ?? '');
-        // Navigate to dashboard
+        await prefs.setString('user_role', data['user']['role'] ?? 'user');
+        
+        // Navigate based on role
         if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const MainNavigationView()),
-          );
+          if (data['user']['role'] == 'admin') {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => AdminRequestView(
+                  token: data['token'],
+                  viewModel: AdminRequestViewModel(
+                    requestRepository: serviceLocator<IRequestRepository>(),
+                  ),
+                ),
+              ),
+            );
+          } else {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const MainNavigationView()),
+            );
+          }
         }
       } else {
         throw Exception(data['error'] ?? 'Social login failed');
@@ -147,10 +169,31 @@ class _LoginViewState extends State<LoginView> {
             }
             if (state is LoginSuccess) {
               await _storeLoginTimestamp();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const MainNavigationView()),
-                (route) => false,
-              );
+              
+              // Store user role for future reference
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('user_role', state.role);
+              
+              if (state.role == 'admin') {
+                // Admin: Navigate to admin view (no bottom navigation)
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => AdminRequestView(
+                      token: state.token,
+                      viewModel: AdminRequestViewModel(
+                        requestRepository: serviceLocator<IRequestRepository>(),
+                      ),
+                    ),
+                  ),
+                  (route) => false,
+                );
+              } else {
+                // User: Navigate to normal dashboard
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const MainNavigationView()),
+                  (route) => false,
+                );
+              }
             } else if (state is LoginFailure) {
               ScaffoldMessenger.of(context)
                 ..hideCurrentSnackBar()

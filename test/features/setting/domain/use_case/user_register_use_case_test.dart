@@ -26,7 +26,7 @@ void main() {
       disease: 'None',
       contact: '1234567890',
       description: 'desc',
-      password: 'password',
+      password: 'password', role: 'user',
     );
     when(() => repo.registerUser(userEntity)).thenAnswer((_) async => const Right(null));
     await usecase(params);

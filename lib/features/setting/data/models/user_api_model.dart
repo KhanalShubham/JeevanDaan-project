@@ -55,7 +55,7 @@ class UserApiModel extends Equatable {
         disease: disease,
         password: password ?? "",
         contact: contact,
-        description: description,
+        description: description, role: 'user',
       );
 
   static List<UserEntity> toEntityList(List<UserApiModel> model) =>

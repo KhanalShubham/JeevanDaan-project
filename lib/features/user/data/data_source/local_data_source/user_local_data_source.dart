@@ -2,6 +2,7 @@ import 'package:jeevandaan/core/network/hive_services.dart';
 import 'package:jeevandaan/features/user/data/data_source/user_data_source.dart';
 import 'package:jeevandaan/features/user/data/models/user_model.dart';
 import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
+import 'package:jeevandaan/features/user/domain/entity/login_response.dart';
 
 class UserLocalDataSource implements IUserDataSource{
   final HiveServices _hiveServices;
@@ -9,15 +10,16 @@ class UserLocalDataSource implements IUserDataSource{
   UserLocalDataSource({required HiveServices hiveservices}):_hiveServices=hiveservices;
 
   @override
-  Future<String>login(String email, String password)async{
-    try{
-      final userdata=await _hiveServices.login(email, password);
-      if(userdata.password==password){
-        return "login successfull";
-      }else{
+  Future<LoginResponse> login(String email, String password) async {
+    try {
+      final userdata = await _hiveServices.login(email, password);
+      if (userdata.password == password) {
+        // Use a dummy token for local login, and return the user's role
+        return LoginResponse(token: 'local_dummy_token', role: userdata.role);
+      } else {
         throw Exception("Invalid username or password");
       }
-    }catch(e){
+    } catch (e) {
       throw Exception("Login failed: $e");
     }
   }

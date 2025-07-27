@@ -1,7 +1,7 @@
 // lib/features/user/presentation/view_model/login_view_model/login_state.dart
 part of 'login_view_model.dart';
 
-abstract class LoginState extends Equatable {
+abstract class LoginState {
   const LoginState();
 
   @override

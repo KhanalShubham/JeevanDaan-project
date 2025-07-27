@@ -1,4 +1,3 @@
-// lib/features/user/presentation/view_model/login_view_model/login_state.dart
 part of 'login_view_model.dart';
 
 abstract class LoginState extends Equatable {
@@ -22,7 +21,14 @@ class LoginInitial extends LoginState {
 class LoginLoading extends LoginState {}
 
 // State when login is successful
-class LoginSuccess extends LoginState {}
+class LoginSuccess extends LoginState {
+  final String role;
+  final String token;
+  const LoginSuccess({required this.role, required this.token});
+
+  @override
+  List<Object?> get props => [role, token];
+}
 
 // State when login fails
 class LoginFailure extends LoginState {

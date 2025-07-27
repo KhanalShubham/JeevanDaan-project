@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:jeevandaan/core/error/failure.dart';
 import 'package:jeevandaan/features/setting/data/data_source/user_remote_datasource.dart';
+import 'package:jeevandaan/features/user/domain/entity/login_response.dart';
 import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
 import 'package:jeevandaan/features/user/domain/repository/user_repository.dart';
 
@@ -12,13 +13,13 @@ class UserRemoteRepositoryImpl implements IUserRepository {
   }) : _userRemoteDatasource = userRemoteDatasource;
 
   @override
-  Future<Either<Failure, String>> login(
+  Future<Either<Failure, LoginResponse>> login(
     String email,
     String password,
   ) async {
     try {
-      final token = await _userRemoteDatasource.login(email, password);
-      return Right(token);
+      final loginResponse = await _userRemoteDatasource.login(email, password);
+      return Right(loginResponse);
     } catch (e) {
       return Left(RemoteDatabaseFailure(message: e.toString()));
     }

@@ -28,7 +28,7 @@ void main() {
           disease: 'None',
           password: 'password',
           contact: '1234567890',
-          description: 'desc',
+          description: 'desc', role: 'user',
         )));
         return SettingsViewModel(
           logoutUseCase: logoutUseCase,

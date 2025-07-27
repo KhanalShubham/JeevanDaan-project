@@ -61,7 +61,7 @@ class UserRegisterUseCase implements UsecaseWithParams<void, RegisterUserParams>
       disease: params.disease,
       contact: params.contact,
       description: params.description,
-      password: params.password,
+      password: params.password, role: 'user',
     );
     return _userRepository.registerUser(userEntity);
   }

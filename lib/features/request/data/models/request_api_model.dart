@@ -19,7 +19,8 @@ class RequestApiModel extends Equatable {
   final String inDepthStory;
   final String citizen;
   final String description;
-  final String uploadedBy;
+  @JsonKey(name: 'uploadedBy')
+  final dynamic uploadedBy; // Can be String (ID) or Map (populated user object)
   final String status;
   final String? feedback;
   final DateTime? createdAt;
@@ -45,6 +46,30 @@ class RequestApiModel extends Equatable {
     this.updatedAt,
   });
 
+  // Helper method to get user name from uploadedBy
+  String get userName {
+    if (uploadedBy is Map<String, dynamic>) {
+      return uploadedBy['name'] ?? 'Unknown User';
+    }
+    return 'Unknown User';
+  }
+
+  // Helper method to get user email from uploadedBy
+  String get userEmail {
+    if (uploadedBy is Map<String, dynamic>) {
+      return uploadedBy['email'] ?? '';
+    }
+    return '';
+  }
+
+  // Helper method to get user image from uploadedBy
+  String get userImagePath {
+    if (uploadedBy is Map<String, dynamic>) {
+      return uploadedBy['filepath'] ?? '';
+    }
+    return '';
+  }
+
   // Factory constructor for fromJson
   factory RequestApiModel.fromJson(Map<String, dynamic> json) =>
       _$RequestApiModelFromJson(json);
@@ -66,12 +91,22 @@ class RequestApiModel extends Equatable {
         inDepthStory: inDepthStory,
         citizen: citizen,
         description: description,
-        uploadedBy: uploadedBy,
+        uploadedBy: _getUploadedByString(),
         status: status,
         feedback: feedback,
         createdAt: createdAt,
         updatedAt: updatedAt,
       );
+
+  // Helper method to convert uploadedBy to string
+  String _getUploadedByString() {
+    if (uploadedBy is Map<String, dynamic>) {
+      return uploadedBy['name'] ?? 'Unknown User';
+    } else if (uploadedBy is String) {
+      return uploadedBy;
+    }
+    return 'Unknown User';
+  }
 
   // Convert Entity to API Object (for outgoing data if needed, but not for file uploads directly)
   static RequestApiModel fromEntity(RequestEntity entity) => RequestApiModel(

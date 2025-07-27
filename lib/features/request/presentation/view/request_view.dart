@@ -9,6 +9,10 @@ import 'package:jeevandaan/features/request/presentation/view_model/request_stat
 import 'package:jeevandaan/features/request/presentation/view_model/request_view_model.dart';
 import 'package:intl/intl.dart';
 import 'package:jeevandaan/core/network/api_service.dart';
+import 'package:provider/provider.dart';
+import 'package:jeevandaan/app/user_notifier.dart';
+import 'package:jeevandaan/app/shared_pref/token_shared_prefs.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -140,7 +144,19 @@ class _RequestPageState extends State<_RequestPage> {
     _checkConnectivity();
     // Fetch requests if it's the list view
     if (!widget.isAddForm) {
-      context.read<RequestViewModel>().add(GetMyRequestsEvent());
+      Future.microtask(() async {
+        final user = Provider.of<UserNotifier>(context, listen: false).user;
+        if (user != null && user.role == 'admin') {
+          final prefs = await SharedPreferences.getInstance();
+          final tokenResult = await TokenSharedPrefs(sharedPreferences: prefs).getToken();
+          String? token = tokenResult.fold((l) => null, (r) => r);
+          if (token != null && token.isNotEmpty) {
+            context.read<RequestViewModel>().add(GetAllRequestsForAdminEvent(token: token));
+          }
+        } else {
+          context.read<RequestViewModel>().add(GetMyRequestsEvent());
+        }
+      });
     }
   }
 

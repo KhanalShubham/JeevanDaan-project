@@ -20,6 +20,10 @@ abstract interface class IRequestRemoteDataSource {
   );
   Future<List<RequestEntity>> getMyRequests();
   Future<void> deleteRequest(String requestId);
+
+  // Admin-specific methods
+  Future<List<RequestEntity>> getAllRequestsForAdmin({String? status, String? date, required String token});
+  Future<void> updateRequestStatus({required String requestId, required String status, required num neededAmount, required String feedback, required String token});
 }
 
 class RequestRemoteDataSourceImpl implements IRequestRemoteDataSource {
@@ -112,6 +116,56 @@ class RequestRemoteDataSourceImpl implements IRequestRemoteDataSource {
       throw ServerException(message: e.response?.data['message'] ?? e.message ?? 'Dio error deleting request');
     } catch (e) {
       throw ServerException(message: 'Unknown error deleting request: $e');
+    }
+  }
+
+  // Admin: Fetch all requests
+  @override
+  Future<List<RequestEntity>> getAllRequestsForAdmin({String? status, String? date, required String token}) async {
+    try {
+      final Map<String, dynamic> queryParams = {};
+      if (status != null) queryParams['status'] = status;
+      if (date != null) queryParams['date'] = date;
+      final response = await apiService.dio.get(
+        ApiEndpoints.baseUrl + ApiEndpoints.getAllRequestsForAdmin,
+        queryParameters: queryParams,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      if (response.statusCode == 200) {
+        final GetAllRequestsDto getAllRequestsDto = GetAllRequestsDto.fromJson(response.data);
+        return RequestApiModel.toEntityList(getAllRequestsDto.data);
+      } else {
+        throw ServerException(message: response.data['message'] ?? 'Failed to fetch admin requests');
+      }
+    } on DioException catch (e) {
+      throw ServerException(message: e.response?.data['message'] ?? e.message ?? 'Dio error fetching admin requests');
+    } catch (e) {
+      throw ServerException(message: 'Unknown error fetching admin requests: $e');
+    }
+  }
+
+  // Admin: Update request status
+  @override
+  Future<void> updateRequestStatus({required String requestId, required String status, required num neededAmount, required String feedback, required String token}) async {
+    try {
+      final response = await apiService.dio.patch(
+        '${ApiEndpoints.baseUrl}${ApiEndpoints.updateRequestStatus}/$requestId/status',
+        data: {
+          'status': status,
+          'neededAmount': neededAmount,
+          'feedback': feedback,
+        },
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      if (response.statusCode == 200) {
+        return;
+      } else {
+        throw ServerException(message: response.data['message'] ?? 'Failed to update request status');
+      }
+    } on DioException catch (e) {
+      throw ServerException(message: e.response?.data['message'] ?? e.message ?? 'Dio error updating request status');
+    } catch (e) {
+      throw ServerException(message: 'Unknown error updating request status: $e');
     }
   }
 }

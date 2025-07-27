@@ -8,22 +8,26 @@ import 'package:jeevandaan/features/request/domain/usecase/get_my_requests_useca
 import 'package:jeevandaan/features/request/presentation/view/request_view.dart';
 import 'package:jeevandaan/features/request/presentation/view_model/request_event.dart';
 import 'package:jeevandaan/features/request/presentation/view_model/request_state.dart'; // For Navigator.push/pop
+import 'package:dartz/dartz.dart';
 
 class RequestViewModel extends Bloc<RequestEvent, RequestState> {
   final AddRequestUseCase addRequestUseCase;
   final GetMyRequestsUseCase getMyRequestsUseCase;
   final DeleteRequestUseCase deleteRequestUseCase;
+  final Future<Either<Failure, List<RequestEntity>>> Function({String? status, String? date, required String token}) getAllRequestsForAdminUseCase;
 
   RequestViewModel({
     required this.addRequestUseCase,
     required this.getMyRequestsUseCase,
     required this.deleteRequestUseCase,
+    required this.getAllRequestsForAdminUseCase,
   }) : super(const RequestState.initial()) {
     on<AddRequestEvent>(_onAddRequest);
     on<GetMyRequestsEvent>(_onGetMyRequests);
     on<DeleteRequestEvent>(_onDeleteRequest);
     on<NavigateToAddRequestEvent>(_onNavigateToAddRequest);
     on<NavigateBackFromAddRequestEvent>(_onNavigateBackFromAddRequest);
+    on<GetAllRequestsForAdminEvent>(_onGetAllRequestsForAdmin);
   }
 
   Future<void> _onAddRequest(AddRequestEvent event, Emitter<RequestState> emit) async {
@@ -134,6 +138,27 @@ class RequestViewModel extends Bloc<RequestEvent, RequestState> {
     if (event.context.mounted) {
       Navigator.pop(event.context);
     }
+  }
+
+  Future<void> _onGetAllRequestsForAdmin(GetAllRequestsForAdminEvent event, Emitter<RequestState> emit) async {
+    emit(state.copyWith(isLoading: true, errorMessage: null, isOperationSuccess: false, successMessage: null));
+    final result = await getAllRequestsForAdminUseCase(token: event.token);
+    result.fold(
+      (failure) {
+        emit(state.copyWith(
+          isLoading: false,
+          errorMessage: _mapFailureToMessage(failure),
+          requests: [],
+        ));
+      },
+      (requests) {
+        emit(state.copyWith(
+          isLoading: false,
+          requests: requests,
+          errorMessage: null,
+        ));
+      },
+    );
   }
 
   String _mapFailureToMessage(Failure failure) {

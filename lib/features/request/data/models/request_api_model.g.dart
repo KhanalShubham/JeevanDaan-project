@@ -20,7 +20,7 @@ RequestApiModel _$RequestApiModelFromJson(Map<String, dynamic> json) =>
       inDepthStory: json['inDepthStory'] as String,
       citizen: json['citizen'] as String,
       description: json['description'] as String,
-      uploadedBy: json['uploadedBy'] as String,
+      uploadedBy: json['uploadedBy'],
       status: json['status'] as String,
       feedback: json['feedback'] as String?,
       createdAt: json['createdAt'] == null

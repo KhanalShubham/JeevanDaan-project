@@ -141,7 +141,7 @@ class _UpdateProfileViewState extends State<UpdateProfileView> {
                                   name: _nameController.text,
                                   contact: _contactController.text,
                                   disease: _diseaseController.text,
-                                  description: _descriptionController.text,
+                                  description: _descriptionController.text, role: 'user',
                                 );
                                 context
                                     .read<UpdateProfileViewModel>()

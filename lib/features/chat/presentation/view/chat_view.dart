@@ -64,7 +64,12 @@ class _ChatViewState extends State<ChatView> {
         final UserEntity dummyCurrentUser = UserEntity(
           userId: '687069107aa9d7f660175f37',
           name: 'Ram',
-          email: 'ram@gmail.com', disease: '', password: '', contact: '', description: '',
+          email: 'ram@gmail.com',
+          disease: '',
+          password: '',
+          contact: '',
+          description: '',
+          role: 'user', // Added required role parameter
         );
         // --- End of Dummy Data ---
 

@@ -80,3 +80,11 @@ class NavigateBackFromAddRequestEvent extends RequestEvent {
   @override
   List<Object?> get props => [context];
 }
+
+// Event to fetch all requests for admin
+class GetAllRequestsForAdminEvent extends RequestEvent {
+  final String token;
+  const GetAllRequestsForAdminEvent({required this.token});
+  @override
+  List<Object?> get props => [token];
+}

@@ -20,4 +20,8 @@ abstract interface class IRequestRepository {
   );
   Future<Either<Failure, List<RequestEntity>>> getMyRequests(); // Assuming RequestEntity exists
   Future<Either<Failure, void>> deleteRequest(String requestId);
+
+  // Admin-specific methods
+  Future<Either<Failure, List<RequestEntity>>> getAllRequestsForAdmin({String? status, String? date, required String token});
+  Future<Either<Failure, void>> updateRequestStatus({required String requestId, required String status, required num neededAmount, required String feedback, required String token});
 }

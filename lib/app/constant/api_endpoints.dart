@@ -14,6 +14,7 @@ class ApiEndpoints {
 
   static const String login = "auth/login";       
   static const String register = "auth/register";   
+  static const String adminLogin = "auth/admin/login"; // Admin login endpoint
   
   static const String getAllUser = "auth/approved";
 
@@ -30,6 +31,10 @@ class ApiEndpoints {
   // This endpoint requires the request ID to be appended to the path.
   // Example usage in Flutter: '${ApiEndpoints.deleteRequest}/$requestId'
   static const String deleteRequest = "${request}"; // Base for deleting by ID
+
+  // Admin request endpoints
+  static const String getAllRequestsForAdmin = "${request}admin"; // GET /api/request/admin
+  static const String updateRequestStatus = "${request}admin"; // PATCH /api/request/admin/:id/status
 
   static const String getMe = "auth/me";
    static const String getDashboardRequests = "request/my-requests"; // Reusing for clarity

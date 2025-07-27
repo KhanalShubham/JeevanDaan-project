@@ -31,8 +31,8 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
       (failure) {
         emit(LoginFailure(error: failure.message));
       },
-      (token) {
-        emit(LoginSuccess());
+      (loginResponse) {
+        emit(LoginSuccess(role: loginResponse.role, token: loginResponse.token));
       },
     );
   }

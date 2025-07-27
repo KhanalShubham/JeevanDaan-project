@@ -4,6 +4,7 @@ import 'package:jeevandaan/core/network/api_service.dart';
 import 'package:jeevandaan/features/user/data/data_source/user_data_source.dart';
 import 'package:jeevandaan/features/user/data/models/user_api_model.dart';
 import 'package:jeevandaan/features/user/domain/entity/user_entity.dart';
+import 'package:jeevandaan/features/user/domain/entity/login_response.dart';
 
 class UserRemoteDatasource implements IUserDataSource {
   final ApiService _apiService;
@@ -12,17 +13,44 @@ class UserRemoteDatasource implements IUserDataSource {
       : _apiService = apiService;
 
   @override
-  Future<String> login(String email, String password) async {
+  Future<LoginResponse> login(String email, String password) async {
     try {
-      final response = await _apiService.dio.post(
+      // First, try admin login
+      try {
+        final adminResponse = await _apiService.dio.post(
+          ApiEndpoints.adminLogin,
+          data: {"username": email, "password": password},
+        );
+        if (adminResponse.statusCode == 200) {
+          final token = adminResponse.data["token"] as String;
+          final user = adminResponse.data["user"] as Map<String, dynamic>;
+          return LoginResponse(
+            token: token, 
+            role: 'admin',
+            user: user,
+          );
+        }
+      } catch (adminError) {
+        // Admin login failed, continue to user login
+        print("Admin login failed, trying user login: $adminError");
+      }
+
+      // If admin login failed, try user login
+      final userResponse = await _apiService.dio.post(
         ApiEndpoints.login,
         data: {"email": email, "password": password},
       );
-      if (response.statusCode == 200) {
-        final str = response.data["token"] as String;
-        return str;
+      if (userResponse.statusCode == 200) {
+        final token = userResponse.data["token"] as String;
+        final userData = userResponse.data["user"] as Map<String, dynamic>;
+        return LoginResponse(
+          token: token, 
+          role: 'user',
+          name: userData["name"],
+          email: userData["email"],
+        );
       } else {
-        throw Exception(response.statusMessage);
+        throw Exception(userResponse.statusMessage);
       }
     } on DioException catch (e) {
       throw Exception("Failed to login user: ${e.message}");

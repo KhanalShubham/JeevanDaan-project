@@ -153,6 +153,8 @@ Future<void> _initRequestModule() async {
       addRequestUseCase: serviceLocator<AddRequestUseCase>(),
       getMyRequestsUseCase: serviceLocator<GetMyRequestsUseCase>(),
       deleteRequestUseCase: serviceLocator<DeleteRequestUseCase>(),
+      getAllRequestsForAdminUseCase: ({String? status, String? date, required String token}) =>
+        serviceLocator<IRequestRepository>().getAllRequestsForAdmin(status: status, date: date, token: token),
     ),
   );
 }

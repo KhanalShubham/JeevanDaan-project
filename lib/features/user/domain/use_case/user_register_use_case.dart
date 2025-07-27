@@ -62,6 +62,7 @@ class UserRegisterUseCase implements UsecaseWithParams<void, RegisterUserParams>
       contact: params.contact,
       description: params.description,
       password: params.password,
+      role: 'user', // Add this line to fix the error
     );
     return _userRepository.registerUser(userEntity);
   }

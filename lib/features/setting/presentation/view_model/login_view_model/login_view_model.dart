@@ -3,9 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jeevandaan/features/user/domain/use_case/user_login_use_case.dart';
 import 'package:jeevandaan/core/error/failure.dart';
-
-part 'login_event.dart';
-part 'login_state.dart';
+import 'package:jeevandaan/features/user/domain/entity/login_response.dart';
+import 'package:jeevandaan/features/user/presentation/view_model/login_view_model/login_view_model.dart';
 
 class LoginViewModel extends Bloc<LoginEvent, LoginState> {
   final UserLoginUseCase _userLoginUseCase;
@@ -31,8 +30,9 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
       (failure) {
         emit(LoginFailure(error: failure.message));
       },
-      (token) {
-        emit(LoginSuccess());
+      (loginResponse) {
+        final res = loginResponse as LoginResponse;
+        emit(LoginSuccess(role: res.role, token: res.token));
       },
     );
   }

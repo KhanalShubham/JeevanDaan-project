@@ -30,16 +30,20 @@ class UserModel extends Equatable{
 
   @HiveField(6)
   final String? password;
+ 
+ @HiveField(7)
+ final String role;
 
   UserModel({
-    String?userId,
+    String? userId,
     required this.name,
     required this.email,
     required this.contact,
     required this.disease,
     required this.description,
     this.password,
-  }):userId=userId??const Uuid().v4();
+    required this.role,
+  }) : userId = userId ?? const Uuid().v4();
 
   const UserModel.initial():
     userId="",
@@ -48,26 +52,36 @@ class UserModel extends Equatable{
     disease="",
     contact="",
     description="",
-    password="";
+    password="",
+   role="user";
 
-    factory UserModel.fromEntity(UserEntity entity){
-      return UserModel(userId: entity.userId, name: entity.name, email: entity.email, disease: entity.disease, contact: entity.contact, description: entity.description, password: entity.password);
-    }
-    UserEntity toEntity(){
-      return UserEntity(
-        userId: userId ?? '',
-        name: name,
-        email: email,
-        disease: disease,
-        password: password ??'',
-        contact: contact,
-        description: description,
-      );
-    }
+  factory UserModel.fromEntity(UserEntity entity) {
+    return UserModel(
+      userId: entity.userId,
+      name: entity.name,
+      email: entity.email,
+      disease: entity.disease,
+      contact: entity.contact,
+      description: entity.description,
+      password: entity.password,
+      role: entity.role,
+    );
+  }
+  UserEntity toEntity() {
+    return UserEntity(
+      userId: userId ?? '',
+      name: name,
+      email: email,
+      disease: disease,
+      password: password ?? '',
+      contact: contact,
+      description: description,
+      role: role,
+    );
+  }
 
-  
   @override
-  List<Object?> get props => [userId,name, email, disease, contact, description, password];
+  List<Object?> get props => [userId, name, email, disease, contact, description, password, role];
 
   
 }
