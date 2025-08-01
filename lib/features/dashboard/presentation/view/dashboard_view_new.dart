@@ -266,7 +266,7 @@ class _DashboardContent extends StatelessWidget {
               crossAxisCount: 2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              childAspectRatio: 1.4,
+              childAspectRatio: 1.2,
               children: [
                 _buildAnalyticsCard(
                   title: 'Active Requests',
@@ -536,17 +536,17 @@ class _DashboardContent extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(icon, color: Colors.white, size: 24),
+              Icon(icon, color: Colors.white, size: 28),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   trend,
                   style: GoogleFonts.poppins(
-                    fontSize: 10,
+                    fontSize: 12,
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
@@ -554,28 +554,20 @@ class _DashboardContent extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          Flexible(
-            child: Text(
-              value,
-              style: GoogleFonts.poppins(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
-          Flexible(
-            child: Text(
-              title,
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: Colors.white.withOpacity(0.9),
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+          Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: Colors.white.withOpacity(0.9),
             ),
           ),
         ],

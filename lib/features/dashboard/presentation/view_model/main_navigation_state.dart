@@ -1,6 +1,7 @@
 // lib/features/dashboard/presentation/view_model/main_navigation_state.dart
 
 import 'package:flutter/material.dart';
+import 'package:jeevandaan/features/chat/presentation/view/chat_view.dart';
 import 'package:jeevandaan/features/dashboard/presentation/view/Bottom_views/dashboard.dart';
 import 'package:jeevandaan/features/dashboard/presentation/view/Bottom_views/message.dart';
 import 'package:jeevandaan/features/dashboard/presentation/view/Bottom_views/notification.dart';
@@ -22,8 +23,8 @@ class MainNavigationState {
       selectedIndex: 0,
       views: [
         const DashboardPage(),
-        const RequestView(), // Use your new RequestView here
-        const MessagePage(),
+        const RequestView(isAddForm: false), // Use your new RequestView here
+        const ChatView(),
         const NotificationPage(),
         const SettingPage()
 
